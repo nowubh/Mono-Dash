@@ -1,7 +1,8 @@
 import Intents
 
-private let appGroupId = "group.cc.boring-lab.monodash"
-private let serversKey = "server_widget_servers"
+// Resolved at runtime (see WidgetSharedConfig) to survive bundle ID / team changes.
+private let appGroupId = WidgetSharedConfig.appGroupIdentifier
+private let serversKey = WidgetSharedConfig.serversKey
 
 final class IntentHandler: INExtension, SelectServerIntentHandling, SelectServerOverviewIntentHandling {
   override func handler(for intent: INIntent) -> Any {

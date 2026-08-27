@@ -4,13 +4,12 @@ import Security
 import WidgetKit
 
 final class ServerWidgetBridge {
-  private static let appGroupId = "group.cc.boring-lab.monodash"
-  private static let keychainAccessGroup = "53R8Z6YBWK.cc.boring-lab.monodash.widget"
-  private static let keychainService = "MonoDashServerWidget"
+  // Identifiers resolve at runtime (see WidgetSharedConfig) so the bridge keeps
+  // working after a re-sign changes the bundle ID or team prefix.
   private static let channelName = "mono_dash/server_widget"
-  private static let serversKey = "server_widget_servers"
-  private static let snapshotsKey = "server_widget_snapshots"
-  private static let settingsKey = "server_widget_settings"
+  private static let serversKey = WidgetSharedConfig.serversKey
+  private static let snapshotsKey = WidgetSharedConfig.snapshotsKey
+  private static let settingsKey = WidgetSharedConfig.settingsKey
   private static let simpleWidgetKind = "ServerStatusWidget"
   private static let horizontalMetricsWidgetKind = "ServerStatusWidgetHorizontalMetrics"
   private static let overviewWidgetKind = "ServerOverviewWidget"
@@ -122,7 +121,7 @@ final class ServerWidgetBridge {
   }
 
   private static var defaults: UserDefaults? {
-    UserDefaults(suiteName: appGroupId)
+    WidgetSharedConfig.sharedDefaults
   }
 
   private static func reloadWidgetTimelines() {
@@ -191,26 +190,14 @@ final class ServerWidgetBridge {
     return 0
   }
 
-  private static func keychainQuery(serverId: Int) -> [String: Any] {
-    [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: keychainService,
-      kSecAttrAccount as String: "server_\(serverId)",
-      kSecAttrAccessGroup as String: keychainAccessGroup
-    ]
-  }
-
+  // API keys go through WidgetApiKeyStore, which prefers the Keychain and falls
+  // back to the shared App Group when the Keychain access group is unavailable
+  // (e.g. after re-signing with a different team).
   private static func saveApiKey(_ apiKey: String, serverId: Int) {
-    guard serverId > 0, let data = apiKey.data(using: .utf8) else { return }
-    var query = keychainQuery(serverId: serverId)
-    SecItemDelete(query as CFDictionary)
-    query[kSecValueData as String] = data
-    query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-    SecItemAdd(query as CFDictionary, nil)
+    WidgetApiKeyStore.save(apiKey, serverId: serverId)
   }
 
   private static func deleteApiKey(serverId: Int) {
-    guard serverId > 0 else { return }
-    SecItemDelete(keychainQuery(serverId: serverId) as CFDictionary)
+    WidgetApiKeyStore.delete(serverId: serverId)
   }
 }

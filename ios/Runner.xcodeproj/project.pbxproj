@@ -36,6 +36,12 @@
 		E8D269946616938DA21FB4B8 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50C0E8586D0DF805F22613C8 /* Pods_RunnerTests.framework */; };
 		FCF507B5AFD7E4E3D4CF144E /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63492E89C6129C6799A17A6D /* Pods_Runner.framework */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		4F3B00100000000000000001 /* WidgetSharedConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00100000000000000001 /* WidgetSharedConfig.swift */; };
+		4F3B00200000000000000001 /* WidgetApiKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00200000000000000001 /* WidgetApiKeyStore.swift */; };
+		4F3B00300000000000000001 /* WidgetSharedConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00100000000000000001 /* WidgetSharedConfig.swift */; };
+		4F3B00400000000000000001 /* WidgetApiKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00200000000000000001 /* WidgetApiKeyStore.swift */; };
+		4F3B00500000000000000001 /* WidgetSharedConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00100000000000000001 /* WidgetSharedConfig.swift */; };
+		4F3B00600000000000000001 /* WidgetApiKeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F3A00200000000000000001 /* WidgetApiKeyStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -136,6 +142,8 @@
 		B962BA402BED2826972C65D5 /* ServerWidgetBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerWidgetBridge.swift; sourceTree = "<group>"; };
 		F12F679F0B328F14AE05E6AE /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+		4F3A00100000000000000001 /* WidgetSharedConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedConfig.swift; sourceTree = "<group>"; };
+		4F3A00200000000000000001 /* WidgetApiKeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetApiKeyStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -287,6 +295,15 @@
 				50C0E8586D0DF805F22613C8 /* Pods_RunnerTests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4F3C00100000000000000001 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				4F3A00100000000000000001 /* WidgetSharedConfig.swift */,
+				4F3A00200000000000000001 /* WidgetApiKeyStore.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -576,6 +593,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				4F3B00100000000000000001 /* WidgetSharedConfig.swift in Sources */,
+				4F3B00200000000000000001 /* WidgetApiKeyStore.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				8E71663D89F4461AB35185A8 /* LocalNetworkAuthorization.swift in Sources */,
@@ -591,6 +610,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B972D53AEF707CB630677405 /* ServerStatusWidget.swift in Sources */,
+				4F3B00300000000000000001 /* WidgetSharedConfig.swift in Sources */,
+				4F3B00400000000000000001 /* WidgetApiKeyStore.swift in Sources */,
 				4F1A00100000000000000001 /* ServerStatusWidgetSimpleStyle.swift in Sources */,
 				4F1A00200000000000000001 /* ServerStatusWidgetHorizontalMetricsStyle.swift in Sources */,
 				4F2A00200000000000000001 /* ServerStatusWidget.intentdefinition in Sources */,
@@ -604,6 +625,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4F2A00500000000000000001 /* IntentHandler.swift in Sources */,
+				4F3B00500000000000000001 /* WidgetSharedConfig.swift in Sources */,
+				4F3B00600000000000000001 /* WidgetApiKeyStore.swift in Sources */,
 				4F2A00300000000000000001 /* ServerStatusWidget.intentdefinition in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

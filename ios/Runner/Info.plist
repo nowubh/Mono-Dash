@@ -32,6 +32,8 @@
 		<true/>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
+	<key>MDAppGroupIdentifier</key>
+	<string>$(APP_GROUP_ID)</string>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Access 1Panel services and website resources on your local network.</string>

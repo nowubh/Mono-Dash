@@ -29,6 +29,8 @@
 				<string>SelectServerIntent</string>
 				<string>SelectServerOverviewIntent</string>
 			</array>
+	<key>MDAppGroupIdentifier</key>
+	<string>$(APP_GROUP_ID)</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.intents-service</string>

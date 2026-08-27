@@ -5,13 +5,13 @@ import Security
 import SwiftUI
 import WidgetKit
 
-private let appGroupId = "group.cc.boring-lab.monodash"
-private let keychainAccessGroup = "53R8Z6YBWK.cc.boring-lab.monodash.widget"
-private let keychainService = "MonoDashServerWidget"
-private let serversKey = "server_widget_servers"
-private let snapshotsKey = "server_widget_snapshots"
+// Identifiers resolve at runtime (see WidgetSharedConfig) so the widget keeps
+// reading the same container after a re-sign changes the bundle ID / team.
+private let appGroupId = WidgetSharedConfig.appGroupIdentifier
+private let serversKey = WidgetSharedConfig.serversKey
+private let snapshotsKey = WidgetSharedConfig.snapshotsKey
 private let errorsKey = "server_widget_errors"
-private let settingsKey = "server_widget_settings"
+private let settingsKey = WidgetSharedConfig.settingsKey
 private let revealedIPServerIdsKey = "server_widget_revealed_ip_server_ids"
 private let skipNextFetchServerIdsKey = "server_widget_skip_next_fetch_server_ids"
 private let simpleWidgetKind = "ServerStatusWidget"
@@ -258,19 +258,7 @@ struct WidgetStore {
   }
 
   static func apiKey(serverId: Int) -> String? {
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrService as String: keychainService,
-      kSecAttrAccount as String: "server_\(serverId)",
-      kSecAttrAccessGroup as String: keychainAccessGroup,
-      kSecReturnData as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne
-    ]
-
-    var result: AnyObject?
-    let status = SecItemCopyMatching(query as CFDictionary, &result)
-    guard status == errSecSuccess, let data = result as? Data else { return nil }
-    return String(data: data, encoding: .utf8)
+    WidgetApiKeyStore.apiKey(serverId: serverId)
   }
 
   private static var decoder: JSONDecoder {
