@@ -1,30 +1,26 @@
-// Configuration file for dynamic identifiers (unsigned / re-signed builds)
-// When re-signing with a different team, update BUNDLE_ID_PREFIX and TEAM_ID
-// to match your Apple Developer Team settings.
+// Shared identifiers for the app and its extensions.
+//
+// This file is included by Flutter's Debug/Release xcconfig (for the Runner
+// target) and set as the base configuration of both extension targets, so the
+// values below are visible everywhere Info.plist and *.entitlements are
+// processed.
+//
+// To build under your own Apple Developer account, change BUNDLE_ID_PREFIX and
+// DEVELOPMENT_TEAM. Everything else is derived, so the app, the widget and the
+// intents extension stay consistent and no identifier has to be hardcoded in
+// Swift.
 
-// Your bundle ID prefix (usually reverse-domain, e.g. com.yourname)
+// Reverse-domain prefix that you control, e.g. com.yourname
 BUNDLE_ID_PREFIX = cc.boring-lab
 
-// Main app bundle ID
-PRODUCT_BUNDLE_IDENTIFIER = $(BUNDLE_ID_PREFIX).monodash
+// Main app bundle ID. Extensions derive their own IDs from this.
+APP_BUNDLE_IDENTIFIER = $(BUNDLE_ID_PREFIX).monodash
 
-// Widget extension bundle ID (must be a sub-path of main app)
-WIDGET_BUNDLE_ID = $(PRODUCT_BUNDLE_IDENTIFIER).ServerStatusWidgetExtension
-WIDGET_INTENTS_BUNDLE_ID = $(PRODUCT_BUNDLE_IDENTIFIER).ServerStatusWidgetIntentsExtension
-
-// App Group identifier (for sharing data between app and widgets)
-// format: group.<bundle-id-prefix>.<app-name>
+// App Group shared by the app and the extensions. Must be `group.` + a domain
+// registered to your team; WidgetSharedConfig also probes this at runtime so a
+// re-signed build recovers even if this value is stale.
 APP_GROUP_ID = group.$(BUNDLE_ID_PREFIX).monodash
 
-// Your Development Team ID (10-character alphanumeric, found at developer.apple.com)
-// Leave empty for unsigned builds
+// 10-character Team ID from developer.apple.com. Leave empty to build unsigned
+// (`flutter build ios --no-codesign`).
 DEVELOPMENT_TEAM = 53R8Z6YBWK
-
-// Code signing style
-CODE_SIGN_STYLE = Automatic
-
-// iCloud KV Store identifier (requires paid Apple Developer account)
-// Format: $(TeamIdentifierPrefix)bundle.id
-// Leave UBIQUITY_STORE_ENABLED = NO for free accounts / unsigned builds
-UBIQUITY_STORE_ENABLED = NO
-UBIQUITY_KVSTORE_IDENTIFIER = $(TeamIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)

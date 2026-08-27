@@ -4,11 +4,11 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.cc.boring-lab.monodash</string>
+		<string>$(APP_GROUP_ID)</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)cc.boring-lab.monodash.widget</string>
+		<string>$(AppIdentifierPrefix)$(APP_BUNDLE_IDENTIFIER).widget</string>
 	</array>
 </dict>
 </plist>

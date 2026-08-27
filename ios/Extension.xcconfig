@@ -1,0 +1,8 @@
+// Base configuration for the widget / intents extension targets.
+//
+// Flutter regenerates Flutter/Generated.xcconfig on every build, so the shared
+// identifiers cannot live there. This wrapper pulls in both, giving the
+// extensions the same APP_GROUP_ID / APP_BUNDLE_IDENTIFIER values that
+// Info.plist and *.entitlements reference.
+#include "Config.xcconfig"
+#include "Flutter/Generated.xcconfig"
