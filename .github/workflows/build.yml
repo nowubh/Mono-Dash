@@ -2,11 +2,19 @@ name: Build Android & iOS
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix-widget-resigning]
   workflow_dispatch:
+
+# Only run the most recent workflow for each branch / PR.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   FLUTTER_CHANNEL: stable
+  # Force-quit Cocoa processes to avoid daemon hangs.
+  COCOA_PODS_NO_INSTALL_STATS: 1
+  COCOA_PODS_DETERMINISTIC_UUIDS: 1
 
 jobs:
   android:
@@ -30,6 +38,12 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
       - name: Build release APK
         run: flutter build apk --release
 
@@ -39,6 +53,7 @@ jobs:
           name: mono-dash-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+          retention-days: 30
 
   ios:
     name: Build iOS (unsigned IPA)
@@ -55,23 +70,55 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Clear team ID for unsigned build
+        run: |
+          # The unsigned build (--no-codesign) should not attempt to resolve
+          # provisioning profiles, so drop DEVELOPMENT_TEAM from Config.xcconfig.
+          # The actual team prefix and App Group are discovered at runtime per
+          # the new WidgetSharedConfig, so unsigned builds keep working after
+          # re-signing with a personal or different team.
+          sed -i '' 's/^DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = /' ios/Config.xcconfig
+
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
+
+      - name: Verify widget extensions are present
+        run: |
+          set -euo pipefail
+          app="build/ios/iphoneos/Runner.app"
+          if [ ! -d "$app" ]; then
+            echo "ERROR: Runner.app not found at $app" >&2
+            exit 1
+          fi
+          plugins="$app/PlugIns"
+          if [ ! -d "$plugins/ServerStatusWidgetExtension.appex" ]; then
+            echo "ERROR: ServerStatusWidgetExtension.appex missing" >&2
+            exit 1
+          fi
+          if [ ! -d "$plugins/ServerStatusWidgetIntentsExtension.appex" ]; then
+            echo "ERROR: ServerStatusWidgetIntentsExtension.appex missing" >&2
+            exit 1
+          fi
+          echo "✓ Widget extensions verified"
 
       - name: Create unsigned IPA
         run: |
           set -euo pipefail
           APP_PATH="build/ios/iphoneos/Runner.app"
-          if [ ! -d "$APP_PATH" ]; then
-            echo "Runner.app not found at $APP_PATH" >&2
-            exit 1
-          fi
-          mkdir -p build/ipa/Payload
-          cp -R "$APP_PATH" build/ipa/Payload/
-          cd build/ipa
+          IPA_DIR="build/ipa"
+          mkdir -p "$IPA_DIR/Payload"
+          cp -R "$APP_PATH" "$IPA_DIR/Payload/"
+          cd "$IPA_DIR"
           zip -qry MonoDash-unsigned.ipa Payload
           cd -
-          ls -lh build/ipa/MonoDash-unsigned.ipa
+          ls -lh "$IPA_DIR/MonoDash-unsigned.ipa"
+          echo "Built unsigned IPA ($(du -h "$IPA_DIR/MonoDash-unsigned.ipa" | cut -f1))"
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
@@ -79,3 +126,4 @@ jobs:
           name: mono-dash-ios-unsigned-ipa
           path: build/ipa/MonoDash-unsigned.ipa
           if-no-files-found: error
+          retention-days: 30
