@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -276,11 +277,7 @@ class _ListenAddressSheetState extends ConsumerState<_ListenAddressSheet> {
             style: TextStyle(fontSize: 14, color: AppColors.label(context)),
           ),
           const Spacer(),
-          CupertinoSwitch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: CupertinoColors.activeGreen,
-          ),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

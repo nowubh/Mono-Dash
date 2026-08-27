@@ -107,7 +107,6 @@ class _FileImageViewerPageState extends ConsumerState<FileImageViewerPage> {
         icon: TablerIcons.share_2,
         isDark: true,
         isOverlapping: isOverlapping,
-        showBlur: false,
         foregroundColor: CupertinoColors.white,
         onTap: _imageData != null ? _shareImage : null,
       ),

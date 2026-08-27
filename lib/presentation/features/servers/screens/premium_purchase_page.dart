@@ -12,6 +12,7 @@ import '../../../common/app_toast.dart';
 import '../../../common/components/app_empty_state.dart';
 import '../../../common/components/frosted_scaffold.dart';
 import '../../purchases/providers/purchase_provider.dart';
+import '../../purchases/widgets/testflight_application_sheet.dart';
 import '../providers/servers_provider.dart';
 
 const _privacyPolicyUrl =
@@ -69,6 +70,7 @@ class _PremiumPurchasePageState extends ConsumerState<PremiumPurchasePage> {
                 const SizedBox(height: 48),
                 _buildBenefitsGrid(
                   context,
+                  ref,
                   l10n,
                   serverCount,
                   isUnlocked,
@@ -135,6 +137,7 @@ class _PremiumPurchasePageState extends ConsumerState<PremiumPurchasePage> {
 
   Widget _buildBenefitsGrid(
     BuildContext context,
+    WidgetRef ref,
     AppLocalizations l10n,
     int serverCount,
     bool isUnlocked,
@@ -161,6 +164,18 @@ class _PremiumPurchasePageState extends ConsumerState<PremiumPurchasePage> {
           hint: l10n.premium_desktopWidgetsFreeHint,
           hintColor: CupertinoColors.systemBlue.resolveFrom(context),
           suffix: l10n.premium_moreFeaturesDescription,
+        ),
+        const SizedBox(height: 24),
+        _BenefitItem(
+          icon: CupertinoIcons.airplane,
+          iconColor: CupertinoColors.systemTeal,
+          title: l10n.premium_testflightTitle,
+          description: l10n.premium_testflightDescription,
+          hint: isUnlocked ? l10n.premium_testflightApplyHint : null,
+          hintColor: CupertinoColors.activeBlue.resolveFrom(context),
+          onTap: isUnlocked
+              ? () => showTestFlightApplicationSheet(context, ref)
+              : null,
         ),
         const SizedBox(height: 24),
         _BenefitItem(
@@ -423,6 +438,7 @@ class _BenefitItem extends StatelessWidget {
   final String? hint;
   final Color? hintColor;
   final String? suffix;
+  final VoidCallback? onTap;
 
   const _BenefitItem({
     required this.icon,
@@ -432,11 +448,12 @@ class _BenefitItem extends StatelessWidget {
     this.hint,
     this.hintColor,
     this.suffix,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final row = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
@@ -487,6 +504,12 @@ class _BenefitItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+    if (onTap == null) return row;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: row,
     );
   }
 }

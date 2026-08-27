@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -731,7 +732,7 @@ class _DatabaseRemoteCreateSheetState
               style: TextStyle(fontSize: 15, color: AppColors.label(context)),
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

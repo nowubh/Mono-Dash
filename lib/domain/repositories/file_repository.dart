@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../data/dto/file/file_item_dto.dart';
 import '../../data/dto/file/user_group_dto.dart';
 import '../../data/dto/file/file_share_dto.dart';
+import '../../data/dto/file/file_favorite_dto.dart';
 
 /// 文件管理仓库接口。
 abstract class FileRepository {
@@ -52,6 +53,9 @@ abstract class FileRepository {
 
   /// 移除收藏。
   Future<void> deleteFavorite(int favoriteID);
+
+  /// 查询收藏列表。
+  Future<List<FileFavoriteDto>> searchFavorites();
 
   /// 获取用户和用户组。
   Future<UserGroupDto> getUserGroups();

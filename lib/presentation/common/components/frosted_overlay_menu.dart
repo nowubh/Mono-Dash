@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import '../../../../core/localization/l10n_x.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'overlay_menu_mixin.dart';
@@ -258,12 +259,18 @@ class _FrostedOverlayMenuButtonState extends State<FrostedOverlayMenuButton>
         : null;
 
     final containerColor = widget.isDark
-        ? CupertinoColors.systemGrey6.darkColor.withValues(
-            alpha: widget.isOverlapping ? 0.6 : 0.35,
-          )
-        : CupertinoColors.systemGrey6.color.withValues(
-            alpha: widget.isOverlapping ? 0.7 : 0.5,
-          );
+        ? CupertinoColors.white.withValues(alpha: 0.15)
+        : CupertinoColors.white.withValues(alpha: 0.5);
+    final glassSettings = LiquidGlassSettings.figma(
+      refraction: 42,
+      depth: 26,
+      dispersion: 5,
+      frost: 1,
+      glassColor: widget.isDark
+          ? const Color(0xFF2C2C2E).withValues(alpha: 0.42)
+          : const Color(0xFFE5E5EA).withValues(alpha: 0.54),
+      lightIntensity: 76,
+    );
 
     return GestureDetector(
       onTap: () {
@@ -277,10 +284,11 @@ class _FrostedOverlayMenuButtonState extends State<FrostedOverlayMenuButton>
           borderRadius: BorderRadius.circular(18),
           boxShadow: glowShadows,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
+        child: LiquidGlassLayer(
+          settings: glassSettings,
+          child: AdaptiveGlass.grouped(
+            quality: GlassQuality.premium,
+            shape: const LiquidRoundedRectangle(borderRadius: 18),
             child: Builder(
               builder: (context) {
                 Widget button = AnimatedContainer(
@@ -292,12 +300,8 @@ class _FrostedOverlayMenuButtonState extends State<FrostedOverlayMenuButton>
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: widget.isDark
-                          ? CupertinoColors.white.withValues(
-                              alpha: widget.isOverlapping ? 0.3 : 0.15,
-                            )
-                          : CupertinoColors.black.withValues(
-                              alpha: widget.isOverlapping ? 0.15 : 0.05,
-                            ),
+                          ? CupertinoColors.white.withValues(alpha: 0.08)
+                          : CupertinoColors.black.withValues(alpha: 0.1),
                       width: 0.5,
                     ),
                   ),

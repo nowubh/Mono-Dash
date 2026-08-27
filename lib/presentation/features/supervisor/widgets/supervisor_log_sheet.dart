@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -493,7 +494,7 @@ class _SwitchTile extends StatelessWidget {
           ),
           Transform.scale(
             scale: 0.72,
-            child: CupertinoSwitch(value: value, onChanged: onChanged),
+            child: AppToggleSwitch(value: value, onChanged: onChanged),
           ),
         ],
       ),

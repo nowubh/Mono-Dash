@@ -237,88 +237,91 @@ class _AppInlinePickerState<T> extends State<AppInlinePicker<T>>
                       ),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(maxHeight: maxHeight),
-                        child: CupertinoScrollbar(
-                          controller: _listController,
-                          child: ListView.separated(
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (_) => true,
+                          child: CupertinoScrollbar(
                             controller: _listController,
-                            primary: false,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: widget.options.length,
-                            separatorBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
+                            child: ListView.separated(
+                              controller: _listController,
+                              primary: false,
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: widget.options.length,
+                              separatorBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                                child: Container(
+                                  height: 0.5,
+                                  color: AppColors.separator(
+                                    context,
+                                  ).withValues(alpha: 0.16),
+                                ),
                               ),
-                              child: Container(
-                                height: 0.5,
-                                color: AppColors.separator(
-                                  context,
-                                ).withValues(alpha: 0.16),
-                              ),
-                            ),
-                            itemBuilder: (context, index) {
-                              final option = widget.options[index];
-                              final selected = option.value == widget.value;
-                              return CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  widget.onChanged(option.value);
-                                  _fadeController.reverse().then((_) {
-                                    if (mounted) {
-                                      setState(() {
-                                        _expanded = false;
-                                        widget.onExpandChanged?.call(false);
-                                      });
-                                    }
-                                  });
-                                },
-                                child: SizedBox(
-                                  height: widget.itemHeight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        if (option.icon != null) ...[
-                                          Icon(
-                                            option.icon,
-                                            size: 16,
-                                            color: selected
-                                                ? selectedColor
-                                                : AppColors.secondaryLabel(
-                                                    context,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                        ],
-                                        Expanded(
-                                          child: Text(
-                                            option.label,
-                                            textAlign: widget.textAlign,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: selected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
+                              itemBuilder: (context, index) {
+                                final option = widget.options[index];
+                                final selected = option.value == widget.value;
+                                return CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    widget.onChanged(option.value);
+                                    _fadeController.reverse().then((_) {
+                                      if (mounted) {
+                                        setState(() {
+                                          _expanded = false;
+                                          widget.onExpandChanged?.call(false);
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    height: widget.itemHeight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          if (option.icon != null) ...[
+                                            Icon(
+                                              option.icon,
+                                              size: 16,
                                               color: selected
                                                   ? selectedColor
-                                                  : AppColors.label(context),
+                                                  : AppColors.secondaryLabel(
+                                                      context,
+                                                    ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Expanded(
+                                            child: Text(
+                                              option.label,
+                                              textAlign: widget.textAlign,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: selected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                                color: selected
+                                                    ? selectedColor
+                                                    : AppColors.label(context),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        if (selected)
-                                          Icon(
-                                            TablerIcons.check,
-                                            size: 16,
-                                            color: selectedColor,
-                                          ),
-                                      ],
+                                          if (selected)
+                                            Icon(
+                                              TablerIcons.check,
+                                              size: 16,
+                                              color: selectedColor,
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -484,90 +487,93 @@ class _AppInlineMultiPickerState<T> extends State<AppInlineMultiPicker<T>>
                       ),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(maxHeight: maxHeight),
-                        child: CupertinoScrollbar(
-                          controller: _listController,
-                          child: ListView.separated(
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (_) => true,
+                          child: CupertinoScrollbar(
                             controller: _listController,
-                            primary: false,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: widget.options.length,
-                            separatorBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
+                            child: ListView.separated(
+                              controller: _listController,
+                              primary: false,
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: widget.options.length,
+                              separatorBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                                child: Container(
+                                  height: 0.5,
+                                  color: AppColors.separator(
+                                    context,
+                                  ).withValues(alpha: 0.16),
+                                ),
                               ),
-                              child: Container(
-                                height: 0.5,
-                                color: AppColors.separator(
-                                  context,
-                                ).withValues(alpha: 0.16),
-                              ),
-                            ),
-                            itemBuilder: (context, index) {
-                              final option = widget.options[index];
-                              final selected = widget.selectedValues.contains(
-                                option.value,
-                              );
-                              return CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  final newList = List<T>.from(
-                                    widget.selectedValues,
-                                  );
-                                  if (selected) {
-                                    newList.remove(option.value);
-                                  } else {
-                                    newList.add(option.value);
-                                  }
-                                  widget.onChanged(newList);
-                                },
-                                child: SizedBox(
-                                  height: widget.itemHeight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        if (option.icon != null) ...[
-                                          Icon(
-                                            option.icon,
-                                            size: 16,
-                                            color: selected
-                                                ? selectedColor
-                                                : AppColors.secondaryLabel(
-                                                    context,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                        ],
-                                        Expanded(
-                                          child: Text(
-                                            option.label,
-                                            textAlign: widget.textAlign,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: selected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
+                              itemBuilder: (context, index) {
+                                final option = widget.options[index];
+                                final selected = widget.selectedValues.contains(
+                                  option.value,
+                                );
+                                return CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    final newList = List<T>.from(
+                                      widget.selectedValues,
+                                    );
+                                    if (selected) {
+                                      newList.remove(option.value);
+                                    } else {
+                                      newList.add(option.value);
+                                    }
+                                    widget.onChanged(newList);
+                                  },
+                                  child: SizedBox(
+                                    height: widget.itemHeight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          if (option.icon != null) ...[
+                                            Icon(
+                                              option.icon,
+                                              size: 16,
                                               color: selected
                                                   ? selectedColor
-                                                  : AppColors.label(context),
+                                                  : AppColors.secondaryLabel(
+                                                      context,
+                                                    ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Expanded(
+                                            child: Text(
+                                              option.label,
+                                              textAlign: widget.textAlign,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: selected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                                color: selected
+                                                    ? selectedColor
+                                                    : AppColors.label(context),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        if (selected)
-                                          Icon(
-                                            TablerIcons.check,
-                                            size: 16,
-                                            color: selectedColor,
-                                          ),
-                                      ],
+                                          if (selected)
+                                            Icon(
+                                              TablerIcons.check,
+                                              size: 16,
+                                              color: selectedColor,
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -717,82 +723,86 @@ class _AppOverlayPickerState<T> extends State<AppOverlayPicker<T>>
                         constraints: BoxConstraints(
                           maxHeight: widget.maxListHeight,
                         ),
-                        child: CupertinoScrollbar(
-                          controller: _listController,
-                          child: ListView.separated(
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (_) => true,
+                          child: CupertinoScrollbar(
                             controller: _listController,
-                            primary: false,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            itemCount: widget.options.length,
-                            separatorBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                            child: ListView.separated(
+                              controller: _listController,
+                              primary: false,
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: widget.options.length,
+                              separatorBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                child: Container(
+                                  height: 0.5,
+                                  color: AppColors.separator(
+                                    context,
+                                  ).withValues(alpha: 0.16),
+                                ),
                               ),
-                              child: Container(
-                                height: 0.5,
-                                color: AppColors.separator(
-                                  context,
-                                ).withValues(alpha: 0.16),
-                              ),
-                            ),
-                            itemBuilder: (context, index) {
-                              final option = widget.options[index];
-                              final selected = option.value == widget.value;
-                              return CupertinoButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: () {
-                                  widget.onChanged(option.value);
-                                  hideOverlayMenu(
-                                    animationController: _overlayAnimController,
-                                  );
-                                },
-                                child: SizedBox(
-                                  height: 36,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        if (option.icon != null) ...[
-                                          Icon(
-                                            option.icon,
-                                            size: 16,
-                                            color: selected
-                                                ? selectedColor
-                                                : AppColors.secondaryLabel(
-                                                    context,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                        ],
-                                        Expanded(
-                                          child: Text(
-                                            option.label,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: selected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
+                              itemBuilder: (context, index) {
+                                final option = widget.options[index];
+                                final selected = option.value == widget.value;
+                                return CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    widget.onChanged(option.value);
+                                    hideOverlayMenu(
+                                      animationController:
+                                          _overlayAnimController,
+                                    );
+                                  },
+                                  child: SizedBox(
+                                    height: 36,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          if (option.icon != null) ...[
+                                            Icon(
+                                              option.icon,
+                                              size: 16,
                                               color: selected
                                                   ? selectedColor
-                                                  : AppColors.label(context),
+                                                  : AppColors.secondaryLabel(
+                                                      context,
+                                                    ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Expanded(
+                                            child: Text(
+                                              option.label,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: selected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                                color: selected
+                                                    ? selectedColor
+                                                    : AppColors.label(context),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        if (selected)
-                                          Icon(
-                                            TablerIcons.check,
-                                            size: 16,
-                                            color: selectedColor,
-                                          ),
-                                      ],
+                                          if (selected)
+                                            Icon(
+                                              TablerIcons.check,
+                                              size: 16,
+                                              color: selectedColor,
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),

@@ -5,6 +5,7 @@ import 'package:dynamic_app_icon_flutter_plus/dynamic_app_icon_flutter_plus.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:toastification/toastification.dart';
 
 import 'core/localization/generated/app_localizations.dart';
@@ -20,15 +21,18 @@ import 'presentation/common/components/terminal/floating_terminal_bubble.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LiquidGlassWidgets.initialize();
   debugPrint('Mono Dash booted');
 
   final storageService = StorageService();
   await storageService.init();
 
   runApp(
-    ProviderScope(
-      overrides: [storageServiceProvider.overrideWithValue(storageService)],
-      child: const ToastificationWrapper(child: MyApp()),
+    LiquidGlassWidgets.wrap(
+      child: ProviderScope(
+        overrides: [storageServiceProvider.overrideWithValue(storageService)],
+        child: const ToastificationWrapper(child: MyApp()),
+      ),
     ),
   );
 }

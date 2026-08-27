@@ -1,7 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../../../core/theme/app_theme.dart';
 
@@ -47,6 +47,16 @@ class FloatingTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final glassSettings = LiquidGlassSettings.figma(
+      refraction: 42,
+      depth: 35,
+      dispersion: 5,
+      frost: 1,
+      glassColor: isDark
+          ? const Color(0xFF2C2C2E).withValues(alpha: 0.42)
+          : const Color(0xFFE5E5EA).withValues(alpha: 0.55),
+      lightIntensity: 76,
+    );
 
     return Center(
       child: Container(
@@ -61,50 +71,76 @@ class FloatingTabBar extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
-            color: isDark
-                ? CupertinoColors.systemBackground.darkColor.withValues(
-                    alpha: 0.65,
-                  )
-                : CupertinoColors.systemBackground.color.withValues(
-                    alpha: 0.75,
-                  ),
-            border: Border.all(
-              color: isDark
-                  ? CupertinoColors.white.withValues(alpha: 0.15)
-                  : CupertinoColors.black.withValues(alpha: 0.08),
-              width: 0.5,
-            ),
             boxShadow: [
               BoxShadow(
-                color: CupertinoColors.black.withValues(
-                  alpha: isDark ? 0.3 : 0.1,
-                ),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: isDark
+                    ? CupertinoColors.black.withValues(alpha: 0.25)
+                    : const Color(0x0C000000),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: isDark
+                    ? CupertinoColors.black.withValues(alpha: 0.15)
+                    : const Color(0x04000000),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: contentHorizontalPadding,
-                ),
-                child: expandItems
-                    ? Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: _buildTabChildren(expandItems: true),
-                      )
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: _buildTabChildren(expandItems: false),
+          child: LiquidGlassLayer(
+            settings: glassSettings,
+            child: AdaptiveGlass.grouped(
+              quality: GlassQuality.premium,
+              shape: const LiquidRoundedRectangle(borderRadius: 28),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(28),
+                            color: isDark
+                                ? const Color(
+                                    0xFF3A3A3C,
+                                  ).withValues(alpha: 0.78)
+                                : const Color(
+                                    0xFFFFFFFF,
+                                  ).withValues(alpha: 0.65),
+                            border: Border.all(
+                              color: isDark
+                                  ? CupertinoColors.white.withValues(
+                                      alpha: 0.08,
+                                    )
+                                  : const Color(0xFFE8E8E8),
+                              width: 0.5,
+                            ),
+                          ),
                         ),
                       ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: contentHorizontalPadding,
+                      ),
+                      child: expandItems
+                          ? Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: _buildTabChildren(expandItems: true),
+                            )
+                          : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: _buildTabChildren(expandItems: false),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -162,7 +198,10 @@ class _FloatingTabItem extends StatelessWidget {
         : AppColors.secondaryLabel(context);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),

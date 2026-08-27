@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/material.dart'
     show
         DefaultMaterialLocalizations,

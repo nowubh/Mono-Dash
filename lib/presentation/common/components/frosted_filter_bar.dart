@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
 import '../../../../core/theme/app_theme.dart';
 
 /// 过滤器项数据模型
@@ -37,8 +39,17 @@ class FrostedFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 当内容经过下方时，降低透明度以获得更通透的毛玻璃效果
-    final alpha = overlaps ? 0.45 : 0.72;
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final glassSettings = LiquidGlassSettings.figma(
+      refraction: 42,
+      depth: 35,
+      dispersion: 5,
+      frost: 1,
+      glassColor: isDark
+          ? const Color(0xFF2C2C2E).withValues(alpha: 0.42)
+          : const Color(0xFFE5E5EA).withValues(alpha: 0.55),
+      lightIntensity: 76,
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
@@ -46,14 +57,7 @@ class FrostedFilterBar extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         height: 46,
         decoration: BoxDecoration(
-          color: AppColors.secondaryBackground(
-            context,
-          ).withValues(alpha: alpha),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: AppColors.separator(context).withValues(alpha: 0.16),
-            width: 0.5,
-          ),
           boxShadow: overlaps
               ? [
                   BoxShadow(
@@ -64,23 +68,53 @@ class FrostedFilterBar extends StatelessWidget {
                 ]
               : null,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              final selected = item.value == selectedValue;
-              return _FilterButton(
-                label: item.label,
-                icon: item.icon,
-                selected: selected,
-                onPressed: () => onSelected(item.value),
-              );
-            },
+        child: LiquidGlassLayer(
+          settings: glassSettings,
+          child: AdaptiveGlass.grouped(
+            quality: GlassQuality.premium,
+            shape: const LiquidRoundedRectangle(borderRadius: 18),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF3A3A3C).withValues(alpha: 0.78)
+                            : const Color(0xFFFFFFFF).withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isDark
+                              ? CupertinoColors.white.withValues(alpha: 0.08)
+                              : const Color(0xFFE8E8E8),
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 7,
+                    ),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      final selected = item.value == selectedValue;
+                      return _FilterButton(
+                        label: item.label,
+                        icon: item.icon,
+                        selected: selected,
+                        onPressed: () => onSelected(item.value),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

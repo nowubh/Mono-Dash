@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../../core/localization/l10n_x.dart';
-import '../../../../core/network/app_user_agent.dart';
+import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
 import '../../../../core/storage/storage_service.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -112,12 +110,7 @@ class WgetTaskTrackerState extends ConsumerState<WgetTaskTracker> {
       final baseUrl = server.baseUrl.toString();
       final uri = Uri.parse(baseUrl);
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
-
-      final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000)
-          .toString();
-      final tokenRaw = '1panel$apiKey$timestamp';
-      final token = md5.convert(utf8.encode(tokenRaw)).toString();
-      final userAgent = await AppUserAgent.value;
+      final headers = await OnePanelAuth.signedHeaders(apiKey);
 
       final wsUrl = Uri(
         scheme: wsScheme,
@@ -127,13 +120,15 @@ class WgetTaskTrackerState extends ConsumerState<WgetTaskTracker> {
         queryParameters: {'operateNode': 'local'},
       );
 
+      await checkAppWebSocketAuth(
+        wsUrl,
+        headers: headers,
+        allowInsecureConnections: server.allowInsecureConnections,
+        currentNode: 'local',
+      );
       final channel = connectAppWebSocket(
         wsUrl,
-        headers: {
-          '1Panel-Token': token,
-          '1Panel-Timestamp': timestamp,
-          HttpHeaders.userAgentHeader: userAgent,
-        },
+        headers: headers,
         allowInsecureConnections: server.allowInsecureConnections,
       );
 

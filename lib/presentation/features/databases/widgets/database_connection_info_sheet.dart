@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -399,9 +400,8 @@ class _DatabaseConnectionInfoSheetState
             ),
           ),
           const SizedBox(width: 8),
-          CupertinoSwitch(
+          AppToggleSwitch(
             value: info.remoteAccess,
-            activeTrackColor: CupertinoColors.activeGreen,
             onChanged: (info.isRunning && !_remoteAccessLoading)
                 ? _toggleRemoteAccess
                 : null,

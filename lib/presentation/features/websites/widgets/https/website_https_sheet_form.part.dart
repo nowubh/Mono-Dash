@@ -499,7 +499,7 @@ class _CompactSwitchTile extends StatelessWidget {
               ],
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -9,9 +10,7 @@ import '../../../common/app_toast.dart';
 import '../../../common/components/action_sheet_launcher.dart';
 import '../../../common/components/action_sheet_scaffold.dart';
 import '../../../common/components/app_action_components.dart';
-import '../../../common/components/app_confirm_sheet.dart';
 import '../models/panel_settings_view_state.dart';
-import '../providers/panel_settings_provider.dart';
 
 /// 显示 API 接口配置弹窗。
 Future<void> showApiInterfaceSheet(
@@ -39,7 +38,6 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
   late final TextEditingController _whitelistController;
   late final TextEditingController _validityController;
   late bool _enabled;
-  bool _saving = false;
 
   @override
   void initState() {
@@ -60,36 +58,6 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
     _whitelistController.dispose();
     _validityController.dispose();
     super.dispose();
-  }
-
-  Future<void> _handleSave() async {
-    if (_saving) return;
-    setState(() => _saving = true);
-
-    try {
-      final controller = ref.read(panelSettingsControllerProvider.notifier);
-      await controller.updateApiConfig(
-        apiKey: _apiKeyController.text,
-        ipWhiteList: _whitelistController.text,
-        apiInterfaceStatus: _enabled ? 'Enable' : 'Disable',
-        apiKeyValidityTime:
-            int.tryParse(_validityController.text) ??
-            widget.initialState.apiKeyValidityTime,
-      );
-      if (mounted) {
-        showAppSuccessToast(context.l10n.common_saved);
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        showAppErrorToast(
-          context.l10n.panelSettings_saveFailed,
-          description: e.toString(),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
   }
 
   @override
@@ -144,27 +112,17 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
           _buildKeySection(),
           const SizedBox(height: 24),
           _buildSecuritySection(),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: CupertinoButton.filled(
-              borderRadius: BorderRadius.circular(14),
-              onPressed: _saving ? null : _handleSave,
-              child: _saving
-                  ? const CupertinoActivityIndicator(
-                      color: CupertinoColors.white,
-                    )
-                  : Text(
-                      context.l10n.panelSettings_saveSettings,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              context.l10n.settings_help_apiKeyContent,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.secondaryLabel(context),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
         ],
       ),
     );
@@ -183,10 +141,7 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
             AppActionRow(
               title: context.l10n.panelSettings_enableApi,
               subtitle: Text(context.l10n.panelSettings_enableApiSubtitle),
-              trailing: CupertinoSwitch(
-                value: _enabled,
-                onChanged: (val) => setState(() => _enabled = val),
-              ),
+              trailing: AppToggleSwitch(value: _enabled, onChanged: null),
             ),
           ],
         ),
@@ -211,6 +166,7 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
                 style: const TextStyle(fontFamily: 'monospace'),
               ),
               onTap: () {
+                if (_apiKeyController.text.isEmpty) return;
                 Clipboard.setData(ClipboardData(text: _apiKeyController.text));
                 showAppSuccessToast(context.l10n.panelSettings_keyCopied);
               },
@@ -218,16 +174,6 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
                 TablerIcons.copy,
                 size: 18,
                 color: CupertinoColors.activeBlue,
-              ),
-            ),
-            AppActionRow(
-              title: context.l10n.panelSettings_resetKey,
-              subtitle: Text(context.l10n.panelSettings_resetKeySubtitle),
-              onTap: _onResetKey,
-              trailing: Icon(
-                TablerIcons.refresh,
-                size: 18,
-                color: CupertinoColors.systemRed.resolveFrom(context),
               ),
             ),
           ],
@@ -261,6 +207,7 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
                   const SizedBox(height: 8),
                   CupertinoTextField(
                     controller: _whitelistController,
+                    readOnly: true,
                     placeholder:
                         context.l10n.panelSettings_apiWhitelistPlaceholder,
                     maxLines: 3,
@@ -281,6 +228,7 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
                 width: 80,
                 child: CupertinoTextField(
                   controller: _validityController,
+                  readOnly: true,
                   placeholder: context.l10n.panelSettings_minutesPlaceholder,
                   textAlign: TextAlign.end,
                   keyboardType: TextInputType.number,
@@ -309,38 +257,5 @@ class _ApiInterfaceSheetState extends ConsumerState<_ApiInterfaceSheet> {
         ),
       ],
     );
-  }
-
-  void _onResetKey() async {
-    final confirmed = await showActionSheet<bool>(
-      context: context,
-      useRootNavigator: true,
-      builder: (ctx) => AppConfirmSheet(
-        title: context.l10n.panelSettings_resetApiKeyTitle,
-        content: context.l10n.panelSettings_resetApiKeyContent,
-        confirmText: context.l10n.panelSettings_confirmReset,
-        confirmColor: CupertinoColors.systemRed,
-        icon: TablerIcons.alert_triangle,
-        iconColor: CupertinoColors.systemRed,
-      ),
-    );
-
-    if (confirmed != true || !mounted) return;
-
-    try {
-      final controller = ref.read(panelSettingsControllerProvider.notifier);
-      final newKey = await controller.generateApiKey();
-      if (mounted) {
-        _apiKeyController.text = newKey;
-        showAppSuccessToast(context.l10n.panelSettings_keyReset);
-      }
-    } catch (e) {
-      if (mounted) {
-        showAppErrorToast(
-          context.l10n.panelSettings_resetFailed,
-          description: e.toString(),
-        );
-      }
-    }
   }
 }

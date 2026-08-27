@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -423,7 +424,7 @@ class _AddServerSheetState extends ConsumerState<AddServerSheet> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          CupertinoSwitch(
+          AppToggleSwitch(
             value: _isHttps,
             onChanged: (val) => setState(() {
               _isHttps = val;
@@ -431,7 +432,6 @@ class _AddServerSheetState extends ConsumerState<AddServerSheet> {
                 _allowInsecureConnections = false;
               }
             }),
-            activeTrackColor: CupertinoColors.activeBlue,
           ),
         ],
       ),
@@ -556,11 +556,7 @@ class _SwitchTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              CupertinoSwitch(
-                value: value,
-                onChanged: onChanged,
-                activeTrackColor: CupertinoColors.activeBlue,
-              ),
+              AppToggleSwitch(value: value, onChanged: onChanged),
             ],
           ),
         ),

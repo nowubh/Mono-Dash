@@ -438,7 +438,7 @@ class _CompactSwitchTile extends StatelessWidget {
               style: TextStyle(fontSize: 13, color: AppColors.label(context)),
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

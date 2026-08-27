@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -1198,10 +1199,9 @@ class _SwitchRowState extends State<_SwitchRow> {
           AnimatedOpacity(
             duration: const Duration(milliseconds: 180),
             opacity: _isWorking ? 0.72 : 1,
-            child: CupertinoSwitch(
+            child: AppToggleSwitch(
               value: _displayValue,
               onChanged: _isWorking ? null : _handleChanged,
-              activeTrackColor: CupertinoColors.activeGreen,
             ),
           ),
         ],

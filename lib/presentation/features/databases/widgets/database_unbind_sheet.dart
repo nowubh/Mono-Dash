@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -294,7 +295,7 @@ class _DatabaseUnbindSheetState extends ConsumerState<_DatabaseUnbindSheet> {
                 ],
               ),
             ),
-            CupertinoSwitch(value: value, onChanged: onChanged),
+            AppToggleSwitch(value: value, onChanged: onChanged),
           ],
         ),
       ),

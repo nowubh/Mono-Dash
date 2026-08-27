@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 
@@ -75,7 +78,32 @@ class SettingApi {
       '/api/v2/core/settings/search',
       data: {},
     );
-    return resp.data?['data'] as Map<String, dynamic>? ?? {};
+    final raw = resp.data?['data'];
+    final settings = raw is Map<String, dynamic>
+        ? Map<String, dynamic>.from(raw)
+        : <String, dynamic>{};
+
+    try {
+      final current = await loadCurrentUser();
+      for (final key in const [
+        'apiInterfaceStatus',
+        'apiKey',
+        'ipWhiteList',
+        'apiKeyValidityTime',
+      ]) {
+        if (current.containsKey(key)) settings[key] = current[key];
+      }
+      final currentName = current['name']?.toString();
+      if ((settings['userName']?.toString().isEmpty ?? true) &&
+          currentName != null &&
+          currentName.isNotEmpty) {
+        settings['userName'] = currentName;
+      }
+    } catch (_) {
+      // Older 1Panel versions do not expose /core/auth/current.
+    }
+
+    return settings;
   }
 
   /// 更新 Core 侧面板配置。
@@ -115,10 +143,43 @@ class SettingApi {
     required String oldPassword,
     required String newPassword,
   }) async {
-    await _client.post(
-      '/api/v2/core/settings/password/update',
-      data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+    await ApiCompatibility.tryVariants<void>(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.current.updatePassword',
+          call: () async {
+            final user = await loadCurrentUser();
+            final name = user['name']?.toString() ?? '';
+            await _client.post(
+              '/api/v2/core/auth/current/update',
+              data: {
+                'name': name,
+                'oldPassword': base64Encode(utf8.encode(oldPassword)),
+                'password': base64Encode(utf8.encode(newPassword)),
+              },
+            );
+          },
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.password.update',
+          call: () async {
+            await _client.post(
+              '/api/v2/core/settings/password/update',
+              data: {'oldPassword': oldPassword, 'newPassword': newPassword},
+            );
+          },
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.password.update',
     );
+  }
+
+  Future<Map<String, dynamic>> loadCurrentUser() async {
+    final resp = await _client.get<Map<String, dynamic>>(
+      '/api/v2/core/auth/current',
+    );
+    return ApiResponseParser.map(resp);
   }
 
   // ── 安全设置 ──
@@ -176,9 +237,26 @@ class SettingApi {
     required String title,
     required int interval,
   }) async {
-    final resp = await _client.post<Map<String, dynamic>>(
-      '/api/v2/core/settings/mfa',
-      data: {'title': title, 'interval': interval},
+    final data = {'title': title, 'interval': interval};
+    final resp = await ApiCompatibility.tryVariants(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.mfa',
+          call: () => _client.post<Map<String, dynamic>>(
+            '/api/v2/core/auth/mfa',
+            data: data,
+          ),
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.mfa',
+          call: () => _client.post<Map<String, dynamic>>(
+            '/api/v2/core/settings/mfa',
+            data: data,
+          ),
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.mfa.load',
     );
     return ApiResponseParser.map(resp);
   }
@@ -190,17 +268,47 @@ class SettingApi {
     required String code,
     required String interval,
   }) async {
-    await _client.post(
-      '/api/v2/core/settings/mfa/bind',
-      data: {'secret': secret, 'code': code, 'interval': interval},
+    final data = {'secret': secret, 'code': code, 'interval': interval};
+    await ApiCompatibility.tryVariants<void>(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.mfa.bind',
+          call: () async {
+            await _client.post('/api/v2/core/auth/mfa/bind', data: data);
+          },
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.mfa.bind',
+          call: () async {
+            await _client.post('/api/v2/core/settings/mfa/bind', data: data);
+          },
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.mfa.bind',
     );
   }
 
   /// 获取 Passkey 列表。
   /// GET /api/v2/core/settings/passkey/list
   Future<List<Map<String, dynamic>>> listPasskeys() async {
-    final resp = await _client.get<Map<String, dynamic>>(
-      '/api/v2/core/settings/passkey/list',
+    final resp = await ApiCompatibility.tryVariants(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.passkey.list',
+          call: () => _client.get<Map<String, dynamic>>(
+            '/api/v2/core/auth/passkey/list',
+          ),
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.passkey.list',
+          call: () => _client.get<Map<String, dynamic>>(
+            '/api/v2/core/settings/passkey/list',
+          ),
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.passkey.list',
     );
     final data = resp.data?['data'];
     if (data is List) return data.whereType<Map<String, dynamic>>().toList();
@@ -210,7 +318,27 @@ class SettingApi {
   /// 删除 Passkey。
   /// DELETE /api/v2/core/settings/passkey/:id
   Future<void> deletePasskey(int id) async {
-    await _client.delete('/api/v2/core/settings/passkey/$id');
+    await ApiCompatibility.tryVariants<void>(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.passkey.del',
+          call: () async {
+            await _client.post(
+              '/api/v2/core/auth/passkey/del',
+              data: {'id': '$id'},
+            );
+          },
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.passkey.delete',
+          call: () async {
+            await _client.delete('/api/v2/core/settings/passkey/$id');
+          },
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.passkey.delete',
+    );
   }
 
   // ── API 接口配置 ──
@@ -218,9 +346,25 @@ class SettingApi {
   /// 生成 API 密钥。
   /// POST /api/v2/core/settings/api/config/generate/key
   Future<String> generateApiKey() async {
-    final resp = await _client.post<Map<String, dynamic>>(
-      '/api/v2/core/settings/api/config/generate/key',
-      data: {},
+    final resp = await ApiCompatibility.tryVariants(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.api.generate',
+          call: () => _client.post<Map<String, dynamic>>(
+            '/api/v2/core/auth/api/generate',
+            data: {},
+          ),
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.api.config.generate.key',
+          call: () => _client.post<Map<String, dynamic>>(
+            '/api/v2/core/settings/api/config/generate/key',
+            data: {},
+          ),
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.api.generate',
     );
     return ApiResponseParser.primitive<String>(resp);
   }
@@ -228,7 +372,27 @@ class SettingApi {
   /// 更新 API 接口配置。
   /// POST /api/v2/core/settings/api/config/update
   Future<void> updateApiConfig(Map<String, dynamic> config) async {
-    await _client.post('/api/v2/core/settings/api/config/update', data: config);
+    await ApiCompatibility.tryVariants<void>(
+      [
+        ApiEndpointVariant(
+          name: 'core.auth.api.update',
+          call: () async {
+            await _client.post('/api/v2/core/auth/api/update', data: config);
+          },
+        ),
+        ApiEndpointVariant(
+          name: 'core.settings.api.config.update',
+          call: () async {
+            await _client.post(
+              '/api/v2/core/settings/api/config/update',
+              data: config,
+            );
+          },
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'core.api.update',
+    );
   }
 
   // ── 快照 ──

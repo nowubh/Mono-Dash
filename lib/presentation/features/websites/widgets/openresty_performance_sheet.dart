@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -219,7 +220,7 @@ class _PerformanceBodyState extends ConsumerState<_PerformanceBody> {
                       ),
                     ),
                   ),
-                  CupertinoSwitch(
+                  AppToggleSwitch(
                     value: _gzip,
                     onChanged: (v) => setState(() => _gzip = v),
                   ),

@@ -1,6 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
@@ -17,7 +17,6 @@ class FrostedActionButton extends StatelessWidget {
     this.isDark = false,
     this.isOverlapping = false,
     this.isLoading = false,
-    this.showBlur = true,
     this.foregroundColor,
   });
 
@@ -27,16 +26,17 @@ class FrostedActionButton extends StatelessWidget {
   final bool isDark;
   final bool isOverlapping;
   final bool isLoading;
-  final bool showBlur;
   final Color? foregroundColor;
 
   bool get _isEnabled => onTap != null && !isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final color = foregroundColor ?? (_isEnabled
-        ? AppColors.label(context)
-        : AppColors.tertiaryLabel(context));
+    final color =
+        foregroundColor ??
+        (_isEnabled
+            ? AppColors.label(context)
+            : AppColors.tertiaryLabel(context));
 
     final glowShadows = isOverlapping
         ? [
@@ -50,15 +50,46 @@ class FrostedActionButton extends StatelessWidget {
         : null;
 
     final containerColor = isDark
-        ? CupertinoColors.systemGrey6.darkColor.withValues(
-            alpha: isOverlapping ? 0.6 : 0.35,
-          )
-        : CupertinoColors.systemGrey6.color.withValues(
-            alpha: isOverlapping ? 0.7 : 0.5,
-          );
+        ? CupertinoColors.white.withValues(alpha: 0.15)
+        : CupertinoColors.white.withValues(alpha: 0.5);
+    final glassSettings = LiquidGlassSettings.figma(
+      refraction: 42,
+      depth: 26,
+      dispersion: 5,
+      frost: 1,
+      glassColor: isDark
+          ? const Color(0xFF2C2C2E).withValues(alpha: 0.42)
+          : const Color(0xFFE5E5EA).withValues(alpha: 0.54),
+      lightIntensity: 76,
+    );
+
+    if (text.isEmpty && icon != null && !isLoading) {
+      return GlassButton(
+        label: text,
+        icon: Icon(icon),
+        iconColor: color,
+        iconSize: 16,
+        width: 34,
+        height: 34,
+        settings: glassSettings,
+        quality: GlassQuality.premium,
+        useOwnLayer: true,
+        stretch: 0.15,
+        enabled: _isEnabled,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap?.call();
+        },
+      );
+    }
 
     return GestureDetector(
-      onTap: _isEnabled ? onTap : null,
+      onTap: _isEnabled
+          ? () {
+              HapticFeedback.lightImpact();
+              onTap!();
+            }
+          : null,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -66,15 +97,14 @@ class FrostedActionButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: glowShadows,
         ),
-        child: showBlur 
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
-                child: _buildBody(context, containerColor, color),
-              ),
-            )
-          : _buildBody(context, containerColor, color),
+        child: LiquidGlassLayer(
+          settings: glassSettings,
+          child: AdaptiveGlass.grouped(
+            quality: GlassQuality.premium,
+            shape: const LiquidRoundedRectangle(borderRadius: 18),
+            child: _buildBody(context, containerColor, color),
+          ),
+        ),
       ),
     );
   }
@@ -83,18 +113,15 @@ class FrostedActionButton extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: 34,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      width: text.isEmpty ? 34 : null,
+      padding: EdgeInsets.symmetric(horizontal: text.isEmpty ? 0 : 14),
       decoration: BoxDecoration(
         color: containerColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark
-              ? CupertinoColors.white.withValues(
-                  alpha: isOverlapping ? 0.3 : 0.15,
-                )
-              : CupertinoColors.black.withValues(
-                  alpha: isOverlapping ? 0.15 : 0.05,
-                ),
+              ? CupertinoColors.white.withValues(alpha: 0.08)
+              : CupertinoColors.black.withValues(alpha: 0.1),
           width: 0.5,
         ),
       ),

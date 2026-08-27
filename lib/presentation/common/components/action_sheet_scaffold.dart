@@ -92,6 +92,12 @@ class ActionSheetScaffold extends StatelessWidget {
     final topArea = header ?? infoCard;
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
     final keyboardPadding = MediaQuery.viewInsetsOf(context).bottom;
+    final double bottomInset = keyboardPadding > 0
+        ? keyboardPadding
+        : (isFloating ? (bottomPadding > 0 ? bottomPadding : 20.0) : 0.0);
+    final availableHeight = (screenHeight - keyboardPadding)
+        .clamp(0.0, screenHeight)
+        .toDouble();
     final baseContentPadding =
         contentPadding ??
         EdgeInsets.fromLTRB(
@@ -100,9 +106,6 @@ class ActionSheetScaffold extends StatelessWidget {
           16,
           isFloating ? 20 : bottomPadding + 20,
         );
-    final effectiveContentPadding = baseContentPadding.add(
-      EdgeInsets.only(bottom: keyboardPadding),
-    );
     final borderRadius = isFloating
         ? BorderRadius.circular(24)
         : const BorderRadius.vertical(top: Radius.circular(24));
@@ -115,11 +118,11 @@ class ActionSheetScaffold extends StatelessWidget {
           hasHorizontalPadding ? 14 : 0,
           0,
           hasHorizontalPadding ? 14 : 0,
-          isFloating ? (bottomPadding > 0 ? bottomPadding : 20) : 0,
+          bottomInset,
         ),
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: screenHeight * maxHeightFactor,
+            maxHeight: availableHeight * maxHeightFactor,
           ),
           child: Column(
             mainAxisSize: isAdaptive ? MainAxisSize.min : MainAxisSize.max,
@@ -199,7 +202,7 @@ class ActionSheetScaffold extends StatelessWidget {
                                 physics:
                                     scrollPhysics ??
                                     const BouncingScrollPhysics(),
-                                padding: effectiveContentPadding,
+                                padding: baseContentPadding,
                                 child: child,
                               ),
                             ),

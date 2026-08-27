@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -272,7 +273,7 @@ class _AlertCard extends StatelessWidget {
                 ],
               ),
             ),
-            CupertinoSwitch(
+            AppToggleSwitch(
               value: alert.status == 'Enable',
               onChanged: (_) => onToggle(),
             ),

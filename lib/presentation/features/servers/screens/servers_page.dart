@@ -9,6 +9,8 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/server.dart';
 import '../../../common/components/floating_tab_bar.dart';
+import '../../../common/components/frosted_action_button.dart';
+import '../../../common/components/frosted_scaffold.dart';
 import '../../purchases/providers/purchase_provider.dart';
 import '../../purchases/widgets/purchase_prompt.dart';
 import '../../settings/providers/app_settings_provider.dart';
@@ -200,142 +202,151 @@ class _ServerListTabState extends ConsumerState<_ServerListTab> {
         ref.watch(appSettingsControllerProvider).valueOrNull?.serverCardStyle ??
         ServerCardStyle.simple;
 
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
+    return FrostedScaffold(
+      title: 'Mono Dash',
+      showBackButton: false,
+      largeTitle: true,
+      fadeOutDistance: 41,
+      trailingBuilder: (isDark, isOverlapping) => FrostedActionButton(
+        text: '',
+        icon: CupertinoIcons.add,
+        isDark: isDark,
+        isOverlapping: isOverlapping,
+        onTap: widget.onAddServer,
       ),
-      slivers: [
-        CupertinoSliverNavigationBar(
-          largeTitle: const Text('Mono Dash'),
-          backgroundColor: AppColors.background(context),
-          border: null,
-          transitionBetweenRoutes: false,
-          trailing: CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: widget.onAddServer,
-            child: const Icon(CupertinoIcons.add_circled, size: 28),
-          ),
+      body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
-        if (_isSorting)
+        slivers: [
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryBackground(
-                    context,
-                  ).withValues(alpha: 0.72),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.separator(context).withValues(alpha: 0.12),
-                    width: 0.5,
+            child: SizedBox(
+              height: FrostedScaffold.contentTopPadding(context) + 60,
+            ),
+          ),
+          if (_isSorting)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryBackground(
+                      context,
+                    ).withValues(alpha: 0.72),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.separator(
+                        context,
+                      ).withValues(alpha: 0.12),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.line_horizontal_3,
+                        size: 18,
+                        color: AppColors.secondaryLabel(context),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.servers_sortHint,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondaryLabel(context),
+                          ),
+                        ),
+                      ),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        onPressed: () => setState(() => _isSorting = false),
+                        child: Text(l10n.common_done),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.line_horizontal_3,
-                      size: 18,
-                      color: AppColors.secondaryLabel(context),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
+              ),
+            ),
+          serversAsync.when(
+            data: (servers) {
+              final orderedServers = _syncOrderedServers(servers);
+              if (servers.isEmpty) {
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 120),
+                    child: Center(
                       child: Text(
-                        l10n.servers_sortHint,
+                        l10n.servers_empty,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
                           color: AppColors.secondaryLabel(context),
                         ),
                       ),
                     ),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      onPressed: () => setState(() => _isSorting = false),
-                      child: Text(l10n.common_done),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        serversAsync.when(
-          data: (servers) {
-            final orderedServers = _syncOrderedServers(servers);
-            if (servers.isEmpty) {
-              return SliverFillRemaining(
-                hasScrollBody: false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 120),
-                  child: Center(
-                    child: Text(
-                      l10n.servers_empty,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.secondaryLabel(context),
-                      ),
-                    ),
                   ),
-                ),
-              );
-            }
+                );
+              }
 
-            return SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 132),
-              sliver: SliverReorderableList(
-                itemBuilder: (context, index) {
-                  final server = orderedServers[index];
-                  return Builder(
-                    key: ValueKey(server.id),
-                    builder: (itemContext) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onLongPress: _isSorting
-                              ? null
-                              : () => _showServerMenu(
-                                  itemContext,
-                                  server,
-                                  cardStyle,
-                                ),
-                          child: _isSorting
-                              ? ReorderableDragStartListener(
-                                  index: index,
-                                  child: ServerCard(
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 132),
+                sliver: SliverReorderableList(
+                  itemBuilder: (context, index) {
+                    final server = orderedServers[index];
+                    return Builder(
+                      key: ValueKey(server.id),
+                      builder: (itemContext) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onLongPress: _isSorting
+                                ? null
+                                : () => _showServerMenu(
+                                    itemContext,
+                                    server,
+                                    cardStyle,
+                                  ),
+                            child: _isSorting
+                                ? ReorderableDragStartListener(
+                                    index: index,
+                                    child: ServerCard(
+                                      server: server,
+                                      style: cardStyle,
+                                    ),
+                                  )
+                                : ServerMemoCurlCard(
                                     server: server,
                                     style: cardStyle,
+                                    onTap: () =>
+                                        context.push('/server/${server.id}'),
                                   ),
-                                )
-                              : ServerMemoCurlCard(
-                                  server: server,
-                                  style: cardStyle,
-                                  onTap: () =>
-                                      context.push('/server/${server.id}'),
-                                ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                itemCount: orderedServers.length,
-                onReorder: _reorderServers,
-              ),
-            );
-          },
-          loading: () => const SliverFillRemaining(
-            child: Center(child: CupertinoActivityIndicator()),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  itemCount: orderedServers.length,
+                  onReorder: _reorderServers,
+                ),
+              );
+            },
+            loading: () => const SliverFillRemaining(
+              child: Center(child: CupertinoActivityIndicator()),
+            ),
+            error: (err, stack) => SliverFillRemaining(
+              child: Center(child: Text(l10n.servers_loadFailed('$err'))),
+            ),
           ),
-          error: (err, stack) => SliverFillRemaining(
-            child: Center(child: Text(l10n.servers_loadFailed('$err'))),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

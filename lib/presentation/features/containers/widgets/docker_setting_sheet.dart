@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -712,7 +713,7 @@ class _SwitchRow extends StatelessWidget {
           ),
           Opacity(
             opacity: enabled ? 1.0 : 0.4,
-            child: CupertinoSwitch(
+            child: AppToggleSwitch(
               value: value,
               onChanged: enabled ? onChanged : null,
             ),

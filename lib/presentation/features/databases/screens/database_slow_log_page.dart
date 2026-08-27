@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -325,9 +326,8 @@ class _DatabaseSlowLogPageState extends ConsumerState<DatabaseSlowLogPage> {
             ),
           ),
           const SizedBox(width: 8),
-          CupertinoSwitch(
+          AppToggleSwitch(
             value: _slowQueryLogEnabled,
-            activeTrackColor: CupertinoColors.activeGreen,
             onChanged: (v) => setState(() => _slowQueryLogEnabled = v),
           ),
         ],

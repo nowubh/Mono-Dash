@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -58,7 +59,7 @@ class PanelSettingsTile extends StatelessWidget {
   }
 }
 
-/// 面板设置开关条目，带图标、标题、副标题和 CupertinoSwitch。
+/// 面板设置开关条目，带图标、标题、副标题和 AppToggleSwitch。
 class PanelSwitchTile extends StatelessWidget {
   const PanelSwitchTile({
     super.key,
@@ -121,7 +122,7 @@ class PanelSwitchTile extends StatelessWidget {
               ],
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );
@@ -194,7 +195,8 @@ class PanelListCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (trailing != null) trailing!
+            if (trailing != null)
+              trailing!
             else if (onTap != null)
               Icon(
                 TablerIcons.chevron_right,

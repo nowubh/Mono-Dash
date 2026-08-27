@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
@@ -134,7 +135,7 @@ class _ContainerCommitDialogState extends ConsumerState<ContainerCommitDialog> {
                   ],
                 ),
               ),
-              CupertinoSwitch(
+              AppToggleSwitch(
                 value: _pause,
                 onChanged: _submitting
                     ? null

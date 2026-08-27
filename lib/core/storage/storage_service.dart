@@ -33,16 +33,6 @@ class StorageService {
   late final File _serversFile;
   final ICloudKeyValueBridge _iCloudKeyValueBridge;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final FlutterSecureStorage _syncSecureStorage = const FlutterSecureStorage(
-    iOptions: IOSOptions(
-      accessibility: KeychainAccessibility.first_unlock,
-      synchronizable: true,
-    ),
-    mOptions: MacOsOptions(
-      accessibility: KeychainAccessibility.first_unlock,
-      synchronizable: true,
-    ),
-  );
   final StreamController<void> _serversChangedController =
       StreamController<void>.broadcast();
   final StreamController<void> _syncStatusController =
@@ -110,16 +100,11 @@ class StorageService {
     await _prefs.remove(_legacyAllowInsecureConnectionsKey);
   }
 
-  Future<void> _normalizeStoredServers({
-    bool migrateApiKeysToSyncKeychain = false,
-  }) async {
+  Future<void> _normalizeStoredServers() async {
     final servers = await _readServers();
     var changed = false;
     for (final server in servers) {
       changed = _ensureServerSyncMetadata(server) || changed;
-      if (migrateApiKeysToSyncKeychain && isServerSyncEnabled) {
-        await _migrateLegacyApiKeyToSyncKeychain(server);
-      }
     }
     if (changed) {
       await _writeServers(servers, syncToCloud: false, notify: false);
@@ -204,7 +189,7 @@ class StorageService {
     if (removedServer != null) {
       await _deleteApiKeyForServer(removedServer);
     } else {
-      await deleteApiKey(id, syncWebDav: false);
+      await deleteApiKey(id, sync: false);
     }
     await deleteServerMemo(id);
   }
@@ -259,7 +244,7 @@ class StorageService {
     if (!enabled) return;
 
     await _tryCloudOperation(_iCloudKeyValueBridge.start);
-    await _normalizeStoredServers(migrateApiKeysToSyncKeychain: true);
+    await _normalizeStoredServers();
     await syncServersFromCloud(force: true);
   }
 
@@ -378,7 +363,7 @@ class StorageService {
   Future<void> _syncServersFromCloud() async {
     if (!isServerSyncEnabled) return;
     await _tryCloudOperation(_iCloudKeyValueBridge.start);
-    await _normalizeStoredServers(migrateApiKeysToSyncKeychain: true);
+    await _normalizeStoredServers();
     await _markSyncAttempt();
 
     final isAvailable = await _tryCloudOperation(
@@ -418,14 +403,15 @@ class StorageService {
         if (removedServer != null) {
           await _deleteApiKeyForServer(removedServer);
         } else {
-          await deleteApiKey(id, syncWebDav: false);
+          await deleteApiKey(id, sync: false);
         }
       }
     }
     if (mergeResult.changedLocalTombstones) {
       await _writeServerTombstones(mergeResult.tombstones);
     }
-    final nextPayload = await _buildServerSyncPayload();
+    await _applyApiKeysFromPayload(remotePayload, mergeResult.servers);
+    final nextPayload = await _buildServerSyncPayload(includeApiKeys: true);
     if (nextPayload.canonicalJson != remotePayload.canonicalJson) {
       await _tryCloudOperation(
         () => _iCloudKeyValueBridge.setString(
@@ -484,7 +470,7 @@ class StorageService {
           if (removedServer != null) {
             await _deleteApiKeyForServer(removedServer);
           } else {
-            await deleteApiKey(id, syncWebDav: false);
+            await deleteApiKey(id, sync: false);
           }
         }
       }
@@ -558,93 +544,30 @@ class StorageService {
 
   String _apiKeyKey(int id) => 'api_key_$id';
 
-  String _syncApiKeyKey(String syncId) => 'api_key_sync_$syncId';
-
   Future<void> saveApiKey(int id, String apiKey) async {
     await _secureStorage.write(key: _apiKeyKey(id), value: apiKey);
-    final server = await getServer(id);
-    if (server == null) return;
-
-    _ensureServerSyncMetadata(server);
-    if (isServerSyncEnabled) {
-      await _trySecureOperation(
-        () => _syncSecureStorage.write(
-          key: _syncApiKeyKey(server.syncId),
-          value: apiKey,
-        ),
-      );
-    }
-    await _pushWebDavApiKeySnapshotIfNeeded();
+    await _pushServerSyncSnapshot();
   }
 
-  Future<String?> getApiKey(int id) async {
-    final server = await getServer(id);
-    if (server != null && isServerSyncEnabled) {
-      _ensureServerSyncMetadata(server);
-      final syncApiKey = await _trySecureOperation(
-        () => _syncSecureStorage.read(key: _syncApiKeyKey(server.syncId)),
-      );
-      if (syncApiKey != null && syncApiKey.isNotEmpty) {
-        return syncApiKey;
-      }
-    }
+  Future<String?> getApiKey(int id) => _secureStorage.read(key: _apiKeyKey(id));
 
-    final legacyApiKey = await _secureStorage.read(key: _apiKeyKey(id));
-    if (isServerSyncEnabled &&
-        server != null &&
-        legacyApiKey != null &&
-        legacyApiKey.isNotEmpty) {
-      await _trySecureOperation(
-        () => _syncSecureStorage.write(
-          key: _syncApiKeyKey(server.syncId),
-          value: legacyApiKey,
-        ),
-      );
-    }
-    return legacyApiKey;
-  }
-
-  Future<void> deleteApiKey(int id, {bool syncWebDav = true}) async {
+  Future<void> deleteApiKey(int id, {bool sync = true}) async {
     final server = await getServer(id);
     if (server != null) {
       await _deleteApiKeyForServer(server);
-      if (syncWebDav) {
-        await _pushWebDavApiKeySnapshotIfNeeded();
+      if (sync) {
+        await _pushServerSyncSnapshot();
       }
       return;
     }
     await _secureStorage.delete(key: _apiKeyKey(id));
-    if (syncWebDav) {
-      await _pushWebDavApiKeySnapshotIfNeeded();
+    if (sync) {
+      await _pushServerSyncSnapshot();
     }
   }
 
   Future<void> _deleteApiKeyForServer(Server server) async {
-    _ensureServerSyncMetadata(server);
-    if (isServerSyncEnabled) {
-      await _trySecureOperation(
-        () => _syncSecureStorage.delete(key: _syncApiKeyKey(server.syncId)),
-      );
-    }
     await _secureStorage.delete(key: _apiKeyKey(server.id));
-  }
-
-  Future<void> _migrateLegacyApiKeyToSyncKeychain(Server server) async {
-    if (server.id <= 0 || server.syncId.isEmpty) return;
-    final syncApiKey = await _trySecureOperation(
-      () => _syncSecureStorage.read(key: _syncApiKeyKey(server.syncId)),
-    );
-    if (syncApiKey != null && syncApiKey.isNotEmpty) return;
-
-    final legacyApiKey = await _secureStorage.read(key: _apiKeyKey(server.id));
-    if (legacyApiKey == null || legacyApiKey.isEmpty) return;
-
-    await _trySecureOperation(
-      () => _syncSecureStorage.write(
-        key: _syncApiKeyKey(server.syncId),
-        value: legacyApiKey,
-      ),
-    );
   }
 
   bool _ensureServerSyncMetadata(Server server) {
@@ -720,10 +643,13 @@ class StorageService {
         _iCloudKeyValueBridge.isAvailable,
       );
       if (isAvailable == true) {
+        final cloudPayload = await _buildServerSyncPayload(
+          includeApiKeys: true,
+        );
         await _tryCloudOperation(
           () => _iCloudKeyValueBridge.setString(
             _serverSyncPayloadKey,
-            payload.canonicalJson,
+            cloudPayload.canonicalJson,
           ),
         );
       }
@@ -808,14 +734,6 @@ class StorageService {
       final apiKey = entry.value;
       if (server == null || apiKey.isEmpty) continue;
       await _secureStorage.write(key: _apiKeyKey(server.id), value: apiKey);
-      if (isServerSyncEnabled) {
-        await _trySecureOperation(
-          () => _syncSecureStorage.write(
-            key: _syncApiKeyKey(server.syncId),
-            value: apiKey,
-          ),
-        );
-      }
     }
   }
 
@@ -1010,14 +928,6 @@ class StorageService {
   }
 
   Future<T?> _tryCloudOperation<T>(Future<T> Function() operation) async {
-    try {
-      return await operation();
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<T?> _trySecureOperation<T>(Future<T> Function() operation) async {
     try {
       return await operation();
     } catch (_) {

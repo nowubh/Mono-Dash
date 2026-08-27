@@ -30,6 +30,8 @@ const cronjobTypeIcons = {
   'cleanLog': TablerIcons.trash,
 };
 
+bool cronjobStatusIsEnabled(String status) => status.toLowerCase() == 'enable';
+
 String cronjobTypeLabel(String type, AppLocalizations l10n) {
   return switch (type) {
     'shell' => l10n.cronjobs_typeShell,
@@ -138,7 +140,9 @@ class CronjobController extends _$CronjobController {
     int id,
     String currentStatus,
   ) async {
-    final newStatus = currentStatus == 'enable' ? 'disable' : 'enable';
+    final newStatus = cronjobStatusIsEnabled(currentStatus)
+        ? 'disable'
+        : 'enable';
     final l10n = ref.read(appLocalizationsProvider);
     final isEnable = newStatus == 'enable';
 

@@ -92,11 +92,14 @@ class ContainerListController
         if (current == null) return;
 
         final repo = await ref.read(containerRepositoryProvider.future);
+        // ponytail: fetch all loaded pages in one request to avoid shrinking
+        // the list and triggering scroll bounce-back
+        final loadedCount = current.page * current.pageSize;
         final results = await Future.wait([
           repo.getStatus(),
           repo.searchContainers(
             page: 1,
-            pageSize: current.pageSize,
+            pageSize: loadedCount,
             state: current.filterState,
             name: current.searchQuery,
           ),
@@ -111,10 +114,10 @@ class ContainerListController
         if (!mounted) return;
         final latest = state.valueOrNull;
         if (latest == null) return;
-        // 请求期间用户若改了筛选/关键字，丢弃本轮结果避免错写
+        // 请求期间用户若改了筛选/关键字/翻页，丢弃本轮结果避免错写
         if (latest.filterState != current.filterState ||
             latest.searchQuery != current.searchQuery ||
-            latest.pageSize != current.pageSize) {
+            latest.page != current.page) {
           return;
         }
 
@@ -124,7 +127,7 @@ class ContainerListController
             total: searchResult.total,
             statusSummary: status,
             stats: statsMap,
-            page: 1,
+            page: current.page,
             isLoadingMore: false,
           ),
         );

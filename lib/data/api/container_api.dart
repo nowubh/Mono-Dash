@@ -140,7 +140,10 @@ class ContainerApi {
         'timestamp': timestamp,
         'operateNode': 'local',
       },
-      options: Options(responseType: ResponseType.stream),
+      options: Options(
+        responseType: ResponseType.stream,
+        headers: const {'Accept': 'text/event-stream'},
+      ),
     );
 
     final body = resp.data;
@@ -174,7 +177,10 @@ class ContainerApi {
         'timestamp': timestamp,
         'operateNode': 'local',
       },
-      options: Options(responseType: ResponseType.stream),
+      options: Options(
+        responseType: ResponseType.stream,
+        headers: const {'Accept': 'text/event-stream'},
+      ),
     );
 
     final body = resp.data;

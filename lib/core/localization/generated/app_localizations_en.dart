@@ -648,6 +648,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get files_actionRemoveFavorite => 'Remove Favorite';
 
   @override
+  String get files_favoritesTitle => 'Favorites';
+
+  @override
+  String get files_favoritesEmpty => 'No favorites yet';
+
+  @override
   String get files_actionManageShare => 'Manage Share';
 
   @override
@@ -2089,6 +2095,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get premium_moreFeaturesDescription =>
       ', multi-device sync, and more advanced features are in development.';
+
+  @override
+  String get premium_testflightTitle => 'TestFlight Beta';
+
+  @override
+  String get premium_testflightDescription =>
+      'Try new features early. You can also leave your contact via in-app feedback — we\'ll send a TestFlight invite.';
+
+  @override
+  String get premium_testflightApplyHint => ' Apply';
 
   @override
   String get premium_supportTitle => 'Support Open Source';
@@ -12016,4 +12032,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supervisor_restart => 'Restart';
+
+  @override
+  String get testflight_title => 'Apply for TestFlight';
+
+  @override
+  String get testflight_description =>
+      'Enter the email for your invitation. It can\'t be changed later.';
+
+  @override
+  String get testflight_emailLabel => 'TestFlight email';
+
+  @override
+  String get testflight_submit => 'Submit';
+
+  @override
+  String get testflight_openApplication => 'Apply for TestFlight access';
+
+  @override
+  String get testflight_invalidEmail => 'Enter a valid email address';
+
+  @override
+  String get testflight_resultTitle => 'Application result';
+
+  @override
+  String get testflight_invited =>
+      'Invitation sent. Check your inbox and spam folder.';
+
+  @override
+  String get testflight_pending =>
+      'Application submitted. Check your email shortly.';
+
+  @override
+  String get testflight_notEligible =>
+      'Can\'t apply right now. Try again later, or leave your contact via feedback.';
+
+  @override
+  String get testflight_alreadyApplied => 'This email has already been used.';
+
+  @override
+  String get testflight_notConfigured =>
+      'This build does not configure the TestFlight application service.';
+
+  @override
+  String get testflight_serviceUnavailable =>
+      'The application service is temporarily unavailable. Try again later.';
 }

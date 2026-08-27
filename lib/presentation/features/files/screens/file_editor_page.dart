@@ -14,6 +14,7 @@ import '../../../../core/localization/l10n_x.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/dto/file/file_item_dto.dart';
 import '../../../common/app_toast.dart';
+import '../../../common/components/app_code_editor.dart';
 import '../../../common/components/defer_init.dart';
 import '../../../common/components/frosted_header.dart';
 import '../../../common/components/frosted_overlay_menu.dart';
@@ -189,6 +190,10 @@ class _FileEditorPageState extends ConsumerState<FileEditorPage> {
                             },
                             child: CodeEditor(
                               controller: _controller,
+                              toolbarController:
+                                  appCodeSelectionToolbarController(
+                                    readOnly: _isReadOnly,
+                                  ),
                               findController: _findController,
                               focusNode: _editorFocusNode,
                               readOnly: _isReadOnly,

@@ -8,6 +8,7 @@ import '../../../common/components/action_sheet_launcher.dart';
 import '../../../common/components/action_sheet_scaffold.dart';
 import '../../../common/components/app_action_components.dart';
 import '../../../common/components/app_confirm_sheet.dart';
+import '../providers/cronjob_provider.dart';
 
 Future<void> showCronjobActionSheet(
   BuildContext context, {
@@ -48,7 +49,7 @@ class _CronjobActionSheet extends ConsumerWidget {
   final VoidCallback onDelete;
   final VoidCallback onViewRecords;
 
-  bool get _isEnabled => item.status == 'enable';
+  bool get _isEnabled => cronjobStatusIsEnabled(item.status);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

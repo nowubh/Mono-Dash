@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:intl/intl.dart';
@@ -231,7 +232,7 @@ class _FileRecycleBinSheetState extends ConsumerState<FileRecycleBinSheet> {
             ),
           ),
           const SizedBox(width: 8),
-          CupertinoSwitch(
+          AppToggleSwitch(
             value: isEnabled,
             onChanged: (value) => ref
                 .read(fileRecycleBinControllerProvider.notifier)

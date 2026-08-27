@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../core/network/api_compatibility.dart';
 import '../../core/network/api_response_parser.dart';
 import '../../core/network/dio_client.dart';
 import '../dto/common/page_result.dart';
@@ -341,19 +342,13 @@ class WebsiteApi {
   Future<void> updateOpenRestyPerformance(Map<String, String> params) async {
     await _client.post<Map<String, dynamic>>(
       '/api/v2/openresty/update',
-      data: {
-        'scope': 'http-per',
-        'operate': 'update',
-        'params': params,
-      },
+      data: {'scope': 'http-per', 'operate': 'update', 'params': params},
     );
   }
 
   /// 查询 OpenResty 主配置文件内容。
   Future<WebsiteConfigFileDto> getOpenRestyConfig() async {
-    final resp = await _client.get<Map<String, dynamic>>(
-      '/api/v2/openresty',
-    );
+    final resp = await _client.get<Map<String, dynamic>>('/api/v2/openresty');
     return ApiResponseParser.object(resp, WebsiteConfigFileDto.fromJson);
   }
 
@@ -395,9 +390,34 @@ class WebsiteApi {
     required WebsiteLogType type,
     required String operate,
   }) async {
-    await _client.post<Map<String, dynamic>>(
-      '/api/v2/websites/log',
-      data: {'id': websiteId, 'operate': operate, 'logType': type.fileName},
+    final data = {
+      'id': websiteId,
+      'operate': operate,
+      'logType': type.fileName,
+    };
+    await ApiCompatibility.tryVariants<void>(
+      [
+        ApiEndpointVariant(
+          name: 'websites.log.operate',
+          call: () async {
+            await _client.post<Map<String, dynamic>>(
+              '/api/v2/websites/log/operate',
+              data: data,
+            );
+          },
+        ),
+        ApiEndpointVariant(
+          name: 'websites.log.legacy',
+          call: () async {
+            await _client.post<Map<String, dynamic>>(
+              '/api/v2/websites/log',
+              data: data,
+            );
+          },
+        ),
+      ],
+      cacheScope: _client,
+      cacheKey: 'websites.log.operate',
     );
   }
 

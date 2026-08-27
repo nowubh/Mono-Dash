@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -97,7 +98,7 @@ class _ImagePullSheetState extends ConsumerState<_ImagePullSheet> {
           const SizedBox(height: 20),
           _buildSection(
             label: context.l10n.containers_pullFromRepo,
-            trailing: CupertinoSwitch(
+            trailing: AppToggleSwitch(
               value: _useRegistry,
               onChanged: (val) => setState(() => _useRegistry = val),
             ),

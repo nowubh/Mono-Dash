@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:uuid/uuid.dart';
@@ -150,11 +151,7 @@ class _UninstallOption extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          CupertinoSwitch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: CupertinoColors.activeBlue,
-          ),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +23,7 @@ import '../../../common/components/action_sheet_scaffold.dart';
 import '../../../common/components/app_action_picker_sheet.dart';
 import '../../../common/components/app_form_components.dart';
 import '../../../common/components/app_picker.dart';
+import '../../../common/components/frosted_scaffold.dart';
 import '../../../common/components/sub_menu_page.dart';
 import '../../panel_settings/widgets/edit_setting_value_sheet.dart';
 import '../../purchases/providers/purchase_provider.dart';
@@ -77,311 +79,322 @@ class ServersSettingsTab extends ConsumerWidget {
     final purchaseAsync = ref.watch(purchaseControllerProvider);
     final isUnlocked = purchaseAsync.valueOrNull?.isUnlocked ?? false;
 
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
-      slivers: [
-        CupertinoSliverNavigationBar(
-          largeTitle: Text(l10n.settings_title),
-          backgroundColor: AppColors.background(context),
-          border: null,
-          transitionBetweenRoutes: false,
+    return FrostedScaffold(
+      title: l10n.settings_title,
+      showBackButton: false,
+      largeTitle: true,
+      fadeOutDistance: 41,
+      body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 132),
-          sliver: SliverList.list(
-            children: [
-              // Premium Section
-              SubMenuCard(
-                title: l10n.settings_premium_title,
-                children: [
-                  _SettingsRow(
-                    icon: isUnlocked
-                        ? CupertinoIcons.sparkles
-                        : CupertinoIcons.lock_shield,
-                    iconColor: isUnlocked
-                        ? CupertinoColors.systemPurple
-                        : CupertinoColors.systemGrey,
-                    title: l10n.settings_premium_unlimitedTitle,
-                    subtitle: isUnlocked
-                        ? l10n.settings_premium_unlimitedUnlocked
-                        : l10n.settings_premium_unlimitedLocked,
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute<void>(
-                        builder: (_) => const PremiumPurchasePage(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Security Section
-              SubMenuCard(
-                title: l10n.settings_security_title,
-                children: [
-                  _SettingsRow(
-                    icon: TablerIcons.lock,
-                    iconColor: CupertinoColors.activeBlue,
-                    title: l10n.settings_appLock_title,
-                    subtitle: appLockEnabled
-                        ? l10n.settings_appLock_subtitleOn
-                        : l10n.settings_appLock_subtitleOff,
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute<void>(
-                        builder: (_) => const AppLockSettingsPage(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Sync Section
-              SubMenuCard(
-                title: l10n.settings_sync_title,
-                children: [
-                  _SettingsSwitchRow(
-                    icon: CupertinoIcons.cloud_fill,
-                    iconColor: CupertinoColors.systemTeal,
-                    title: l10n.settings_sync_iCloudTitle,
-                    subtitle: _syncStatusSubtitle(
-                      context,
-                      syncStatus,
-                      syncStatusAsync.isLoading,
-                    ),
-                    value: syncEnabled,
-                    onChanged: syncStatusAsync.isLoading
-                        ? null
-                        : (value) => _setServerSyncEnabled(context, ref, value),
-                  ),
-                  if (syncEnabled)
+        slivers: [
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: FrostedScaffold.contentTopPadding(context) + 60,
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 132),
+            sliver: SliverList.list(
+              children: [
+                // Premium Section
+                SubMenuCard(
+                  title: l10n.settings_premium_title,
+                  children: [
                     _SettingsRow(
-                      icon: CupertinoIcons.arrow_2_circlepath,
+                      icon: isUnlocked
+                          ? CupertinoIcons.sparkles
+                          : CupertinoIcons.lock_shield,
+                      iconColor: isUnlocked
+                          ? CupertinoColors.systemPurple
+                          : CupertinoColors.systemGrey,
+                      title: l10n.settings_premium_unlimitedTitle,
+                      subtitle: isUnlocked
+                          ? l10n.settings_premium_unlimitedUnlocked
+                          : l10n.settings_premium_unlimitedLocked,
+                      onTap: () => Navigator.of(context).push(
+                        CupertinoPageRoute<void>(
+                          builder: (_) => const PremiumPurchasePage(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Security Section
+                SubMenuCard(
+                  title: l10n.settings_security_title,
+                  children: [
+                    _SettingsRow(
+                      icon: TablerIcons.lock,
                       iconColor: CupertinoColors.activeBlue,
-                      title: l10n.settings_sync_syncNowTitle,
-                      subtitle: _syncAttemptSubtitle(context, syncStatus),
-                      onTap: syncStatusAsync.isLoading
+                      title: l10n.settings_appLock_title,
+                      subtitle: appLockEnabled
+                          ? l10n.settings_appLock_subtitleOn
+                          : l10n.settings_appLock_subtitleOff,
+                      onTap: () => Navigator.of(context).push(
+                        CupertinoPageRoute<void>(
+                          builder: (_) => const AppLockSettingsPage(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Sync Section
+                SubMenuCard(
+                  title: l10n.settings_sync_title,
+                  children: [
+                    _SettingsSwitchRow(
+                      icon: CupertinoIcons.cloud_fill,
+                      iconColor: CupertinoColors.systemTeal,
+                      title: l10n.settings_sync_iCloudTitle,
+                      subtitle: _syncStatusSubtitle(
+                        context,
+                        syncStatus,
+                        syncStatusAsync.isLoading,
+                      ),
+                      value: syncEnabled,
+                      onChanged: syncStatusAsync.isLoading
                           ? null
-                          : () => _syncServersNow(context, ref),
+                          : (value) =>
+                                _setServerSyncEnabled(context, ref, value),
                     ),
-                  _SettingsRow(
-                    icon: TablerIcons.server_bolt,
-                    iconColor: CupertinoColors.systemIndigo,
-                    title: l10n.settings_sync_webDavConfigTitle,
-                    subtitle: _webDavConfigSubtitle(context, webDavSyncStatus),
-                    onTap: webDavSyncStatusAsync.isLoading
-                        ? null
-                        : () => _showWebDavConfigSheet(context, ref),
-                  ),
-                  _SettingsSwitchRow(
-                    icon: CupertinoIcons.cloud_upload_fill,
-                    iconColor: CupertinoColors.systemGreen,
-                    title: l10n.settings_sync_webDavTitle,
-                    subtitle: _webDavSyncStatusSubtitle(
-                      context,
-                      webDavSyncStatus,
-                      webDavSyncStatusAsync.isLoading,
-                    ),
-                    value: webDavSyncEnabled,
-                    onChanged: webDavSyncStatusAsync.isLoading
-                        ? null
-                        : (value) => _setWebDavSyncEnabled(context, ref, value),
-                  ),
-                  if (webDavSyncEnabled)
+                    if (syncEnabled)
+                      _SettingsRow(
+                        icon: CupertinoIcons.arrow_2_circlepath,
+                        iconColor: CupertinoColors.activeBlue,
+                        title: l10n.settings_sync_syncNowTitle,
+                        subtitle: _syncAttemptSubtitle(context, syncStatus),
+                        onTap: syncStatusAsync.isLoading
+                            ? null
+                            : () => _syncServersNow(context, ref),
+                      ),
                     _SettingsRow(
-                      icon: CupertinoIcons.arrow_2_circlepath,
-                      iconColor: CupertinoColors.activeBlue,
-                      title: l10n.settings_sync_syncNowTitle,
-                      subtitle: _webDavSyncAttemptSubtitle(
+                      icon: TablerIcons.server_bolt,
+                      iconColor: CupertinoColors.systemIndigo,
+                      title: l10n.settings_sync_webDavConfigTitle,
+                      subtitle: _webDavConfigSubtitle(
                         context,
                         webDavSyncStatus,
                       ),
                       onTap: webDavSyncStatusAsync.isLoading
                           ? null
-                          : () => _syncServersFromWebDavNow(context, ref),
+                          : () => _showWebDavConfigSheet(context, ref),
                     ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                    _SettingsSwitchRow(
+                      icon: CupertinoIcons.cloud_upload_fill,
+                      iconColor: CupertinoColors.systemGreen,
+                      title: l10n.settings_sync_webDavTitle,
+                      subtitle: _webDavSyncStatusSubtitle(
+                        context,
+                        webDavSyncStatus,
+                        webDavSyncStatusAsync.isLoading,
+                      ),
+                      value: webDavSyncEnabled,
+                      onChanged: webDavSyncStatusAsync.isLoading
+                          ? null
+                          : (value) =>
+                                _setWebDavSyncEnabled(context, ref, value),
+                    ),
+                    if (webDavSyncEnabled)
+                      _SettingsRow(
+                        icon: CupertinoIcons.arrow_2_circlepath,
+                        iconColor: CupertinoColors.activeBlue,
+                        title: l10n.settings_sync_syncNowTitle,
+                        subtitle: _webDavSyncAttemptSubtitle(
+                          context,
+                          webDavSyncStatus,
+                        ),
+                        onTap: webDavSyncStatusAsync.isLoading
+                            ? null
+                            : () => _syncServersFromWebDavNow(context, ref),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // Appearance Section
-              SubMenuCard(
-                title: l10n.settings_appearance_title,
-                children: [
-                  _SettingsRow(
-                    icon: TablerIcons.sun_moon,
-                    iconColor: CupertinoColors.systemIndigo,
-                    title: l10n.settings_appearance_modeTitle,
-                    subtitle: selectedAppearanceMode.labelOf(l10n),
-                    onTap: settingsAsync.isLoading
-                        ? null
-                        : () => _editAppearanceMode(
-                            context,
-                            ref,
-                            selectedAppearanceMode,
-                          ),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.app_badge,
-                    iconColor: CupertinoColors.activeOrange,
-                    title: l10n.settings_appearance_appIconTitle,
-                    subtitle: selectedIconVariant.labelOf(l10n),
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute<void>(
-                        builder: (_) => const AppIconSettingsPage(),
+                // Appearance Section
+                SubMenuCard(
+                  title: l10n.settings_appearance_title,
+                  children: [
+                    _SettingsRow(
+                      icon: TablerIcons.sun_moon,
+                      iconColor: CupertinoColors.systemIndigo,
+                      title: l10n.settings_appearance_modeTitle,
+                      subtitle: selectedAppearanceMode.labelOf(l10n),
+                      onTap: settingsAsync.isLoading
+                          ? null
+                          : () => _editAppearanceMode(
+                              context,
+                              ref,
+                              selectedAppearanceMode,
+                            ),
+                    ),
+                    _SettingsRow(
+                      icon: CupertinoIcons.app_badge,
+                      iconColor: CupertinoColors.activeOrange,
+                      title: l10n.settings_appearance_appIconTitle,
+                      subtitle: selectedIconVariant.labelOf(l10n),
+                      onTap: () => Navigator.of(context).push(
+                        CupertinoPageRoute<void>(
+                          builder: (_) => const AppIconSettingsPage(),
+                        ),
                       ),
                     ),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.rectangle_grid_1x2,
-                    iconColor: CupertinoColors.activeBlue,
-                    title: l10n.settings_appearance_cardStyleTitle,
-                    subtitle: selectedCardStyle.labelOf(l10n),
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute<void>(
-                        builder: (_) => const CardStyleSettingsPage(),
+                    _SettingsRow(
+                      icon: CupertinoIcons.rectangle_grid_1x2,
+                      iconColor: CupertinoColors.activeBlue,
+                      title: l10n.settings_appearance_cardStyleTitle,
+                      subtitle: selectedCardStyle.labelOf(l10n),
+                      onTap: () => Navigator.of(context).push(
+                        CupertinoPageRoute<void>(
+                          builder: (_) => const CardStyleSettingsPage(),
+                        ),
                       ),
                     ),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.globe,
-                    iconColor: CupertinoColors.systemTeal,
-                    title: l10n.settings_language_title,
-                    subtitle: localeOption.labelOf(l10n),
-                    onTap: () => _editLanguage(context, ref, localeOption),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Network Section
-              SubMenuCard(
-                title: l10n.settings_network_title,
-                children: [
-                  _SettingsRow(
-                    icon: CupertinoIcons.timer,
-                    iconColor: CupertinoColors.systemGrey,
-                    title: l10n.settings_network_requestTimeoutTitle,
-                    subtitle: l10n.settings_network_requestTimeoutSubtitle(
-                      requestTimeoutSeconds,
+                    _SettingsRow(
+                      icon: CupertinoIcons.globe,
+                      iconColor: CupertinoColors.systemTeal,
+                      title: l10n.settings_language_title,
+                      subtitle: localeOption.labelOf(l10n),
+                      onTap: () => _editLanguage(context, ref, localeOption),
                     ),
-                    onTap: settingsAsync.isLoading
-                        ? null
-                        : () => _editRequestTimeout(
-                            context,
-                            ref,
-                            requestTimeoutSeconds,
-                          ),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.text_badge_plus,
-                    iconColor: CupertinoColors.systemGrey,
-                    title: l10n.settings_network_customHeadersTitle,
-                    subtitle: customHeaders.isEmpty
-                        ? l10n.settings_network_customHeadersEmpty
-                        : l10n.settings_network_customHeadersCount(
-                            customHeaders.length,
-                          ),
-                    onTap: settingsAsync.isLoading
-                        ? null
-                        : () => _editCustomHeaders(context, ref, customHeaders),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // Storage Section
-              SubMenuCard(
-                title: l10n.settings_general_title,
-                children: [
-                  _SettingsSwitchRow(
-                    icon: CupertinoIcons.arrow_2_circlepath,
-                    iconColor: CupertinoColors.activeBlue,
-                    title: l10n.settings_serversAutoRefreshTitle,
-                    subtitle: serversAutoRefreshEnabled
-                        ? l10n.settings_serversAutoRefreshSubtitleOn(
-                            serversRefreshIntervalSeconds,
-                          )
-                        : l10n.settings_serversAutoRefreshSubtitleOff,
-                    value: serversAutoRefreshEnabled,
-                    onChanged: settingsAsync.isLoading
-                        ? null
-                        : (value) => ref
-                              .read(appSettingsControllerProvider.notifier)
-                              .setServersAutoRefreshEnabled(value),
-                  ),
-                  if (serversAutoRefreshEnabled)
+                // Network Section
+                SubMenuCard(
+                  title: l10n.settings_network_title,
+                  children: [
                     _SettingsRow(
                       icon: CupertinoIcons.timer,
                       iconColor: CupertinoColors.systemGrey,
-                      title: l10n.settings_serversRefreshIntervalTitle,
-                      subtitle: l10n.settings_serversRefreshIntervalSubtitle(
-                        serversRefreshIntervalSeconds,
+                      title: l10n.settings_network_requestTimeoutTitle,
+                      subtitle: l10n.settings_network_requestTimeoutSubtitle(
+                        requestTimeoutSeconds,
                       ),
                       onTap: settingsAsync.isLoading
                           ? null
-                          : () => _editServersRefreshInterval(
+                          : () => _editRequestTimeout(
                               context,
                               ref,
-                              serversRefreshIntervalSeconds,
+                              requestTimeoutSeconds,
                             ),
                     ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.archivebox_fill,
-                    iconColor: CupertinoColors.systemBrown,
-                    title: l10n.settings_cache_title,
-                    subtitle: l10n.settings_cache_subtitle,
-                    onTap: () => _showCacheManagementSheet(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Help & About Section
-              SubMenuCard(
-                title: l10n.settings_help_title,
-                children: [
-                  _SettingsRow(
-                    icon: CupertinoIcons.chat_bubble_2_fill,
-                    iconColor: CupertinoColors.activeBlue,
-                    title: l10n.settings_help_contactTitle,
-                    subtitle: l10n.settings_help_contactSubtitle,
-                    onTap: () => _showContactSupportSheet(context),
-                  ),
-                  _SettingsRow(
-                    icon: TablerIcons.brand_github,
-                    iconColor: CupertinoColors.systemPurple,
-                    title: l10n.settings_help_openSourceTitle,
-                    subtitle: l10n.settings_help_openSourceSubtitle,
-                    onTap: () => _showOpenSourceProjectSheet(context),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.doc_text_fill,
-                    iconColor: CupertinoColors.systemOrange,
-                    title: l10n.settings_help_licensesTitle,
-                    subtitle: l10n.settings_help_licensesSubtitle,
-                    onTap: () => _showOpenSourceLicenses(context),
-                  ),
-                  _SettingsRow(
-                    icon: CupertinoIcons.info_circle_fill,
-                    iconColor: CupertinoColors.systemGrey,
-                    title: l10n.settings_help_aboutTitle,
-                    onTap: () => _showInfoDialog(
-                      context,
-                      title: l10n.settings_help_aboutTitle,
-                      content: l10n.settings_help_aboutContent,
+                    _SettingsRow(
+                      icon: CupertinoIcons.text_badge_plus,
+                      iconColor: CupertinoColors.systemGrey,
+                      title: l10n.settings_network_customHeadersTitle,
+                      subtitle: customHeaders.isEmpty
+                          ? l10n.settings_network_customHeadersEmpty
+                          : l10n.settings_network_customHeadersCount(
+                              customHeaders.length,
+                            ),
+                      onTap: settingsAsync.isLoading
+                          ? null
+                          : () =>
+                                _editCustomHeaders(context, ref, customHeaders),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const _AppInfoFooter(),
-            ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Storage Section
+                SubMenuCard(
+                  title: l10n.settings_general_title,
+                  children: [
+                    _SettingsSwitchRow(
+                      icon: CupertinoIcons.arrow_2_circlepath,
+                      iconColor: CupertinoColors.activeBlue,
+                      title: l10n.settings_serversAutoRefreshTitle,
+                      subtitle: serversAutoRefreshEnabled
+                          ? l10n.settings_serversAutoRefreshSubtitleOn(
+                              serversRefreshIntervalSeconds,
+                            )
+                          : l10n.settings_serversAutoRefreshSubtitleOff,
+                      value: serversAutoRefreshEnabled,
+                      onChanged: settingsAsync.isLoading
+                          ? null
+                          : (value) => ref
+                                .read(appSettingsControllerProvider.notifier)
+                                .setServersAutoRefreshEnabled(value),
+                    ),
+                    if (serversAutoRefreshEnabled)
+                      _SettingsRow(
+                        icon: CupertinoIcons.timer,
+                        iconColor: CupertinoColors.systemGrey,
+                        title: l10n.settings_serversRefreshIntervalTitle,
+                        subtitle: l10n.settings_serversRefreshIntervalSubtitle(
+                          serversRefreshIntervalSeconds,
+                        ),
+                        onTap: settingsAsync.isLoading
+                            ? null
+                            : () => _editServersRefreshInterval(
+                                context,
+                                ref,
+                                serversRefreshIntervalSeconds,
+                              ),
+                      ),
+                    _SettingsRow(
+                      icon: CupertinoIcons.archivebox_fill,
+                      iconColor: CupertinoColors.systemBrown,
+                      title: l10n.settings_cache_title,
+                      subtitle: l10n.settings_cache_subtitle,
+                      onTap: () => _showCacheManagementSheet(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Help & About Section
+                SubMenuCard(
+                  title: l10n.settings_help_title,
+                  children: [
+                    _SettingsRow(
+                      icon: CupertinoIcons.chat_bubble_2_fill,
+                      iconColor: CupertinoColors.activeBlue,
+                      title: l10n.settings_help_contactTitle,
+                      subtitle: l10n.settings_help_contactSubtitle,
+                      onTap: () => _showContactSupportSheet(context),
+                    ),
+                    _SettingsRow(
+                      icon: TablerIcons.brand_github,
+                      iconColor: CupertinoColors.systemPurple,
+                      title: l10n.settings_help_openSourceTitle,
+                      subtitle: l10n.settings_help_openSourceSubtitle,
+                      onTap: () => _showOpenSourceProjectSheet(context),
+                    ),
+                    _SettingsRow(
+                      icon: CupertinoIcons.doc_text_fill,
+                      iconColor: CupertinoColors.systemOrange,
+                      title: l10n.settings_help_licensesTitle,
+                      subtitle: l10n.settings_help_licensesSubtitle,
+                      onTap: () => _showOpenSourceLicenses(context),
+                    ),
+                    _SettingsRow(
+                      icon: CupertinoIcons.info_circle_fill,
+                      iconColor: CupertinoColors.systemGrey,
+                      title: l10n.settings_help_aboutTitle,
+                      onTap: () => _showInfoDialog(
+                        context,
+                        title: l10n.settings_help_aboutTitle,
+                        content: l10n.settings_help_aboutContent,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                const _AppInfoFooter(),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1272,7 +1285,7 @@ class _SettingsSwitchRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

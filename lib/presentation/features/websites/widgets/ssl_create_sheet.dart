@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import '../../../../core/localization/l10n_x.dart';
@@ -154,7 +155,7 @@ class _SslCreateSheetState extends State<_SslCreateSheet> {
       isAdaptive: true,
       maxHeightFactor: 0.85,
       showHandle: false,
-      contentPadding: EdgeInsets.zero,
+      contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       panelHeader: Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 12, 4),
         child: Row(
@@ -197,110 +198,98 @@ class _SslCreateSheetState extends State<_SslCreateSheet> {
           ],
         ),
       ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AppSectionHeader(
-              title: context.l10n.websites_basicInfo,
-              icon: TablerIcons.info_circle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppSectionHeader(
+            title: context.l10n.websites_basicInfo,
+            icon: TablerIcons.info_circle,
+          ),
+          _buildTextField(
+            controller: _primaryDomainController,
+            label: context.l10n.websites_primaryDomain,
+            placeholder: context.l10n.websites_primaryDomainExample,
+            icon: TablerIcons.world,
+          ),
+          const SizedBox(height: 12),
+          _buildTextField(
+            controller: _otherDomainsController,
+            label: context.l10n.websites_otherDomains,
+            placeholder: context.l10n.websites_otherDomainsPlaceholder,
+            icon: TablerIcons.world_latitude,
+            multiline: true,
+          ),
+          const SizedBox(height: 12),
+          _buildTextField(
+            controller: _descriptionController,
+            label: context.l10n.common_description,
+            placeholder: context.l10n.websites_optional,
+            icon: TablerIcons.notes,
+          ),
+          const SizedBox(height: 18),
+          AppSectionHeader(
+            title: context.l10n.websites_validationMethod,
+            icon: TablerIcons.shield_check,
+          ),
+          _buildPickerSection<String>(
+            icon: TablerIcons.shield_check,
+            label: context.l10n.websites_validationMethod,
+            value: _provider,
+            options: _providerOptions(context),
+            onChanged: (v) => setState(() => _provider = v),
+          ),
+          if (_provider != 'selfSigned') ...[
+            const SizedBox(height: 12),
+            _buildPickerSection<int>(
+              icon: TablerIcons.user_circle,
+              label: context.l10n.websites_acmeAccount,
+              value: _acmeAccountId,
+              options: widget.acmeAccounts
+                  .map(
+                    (a) => AppPickerOption(value: a.id, label: a.displayName),
+                  )
+                  .toList(),
+              onChanged: (v) => setState(() => _acmeAccountId = v),
             ),
-            _buildTextField(
-              controller: _primaryDomainController,
-              label: context.l10n.websites_primaryDomain,
-              placeholder: context.l10n.websites_primaryDomainExample,
+          ],
+          if (_provider == 'dnsAccount') ...[
+            const SizedBox(height: 12),
+            _buildPickerSection<int>(
               icon: TablerIcons.world,
+              label: context.l10n.websites_dnsAccount,
+              value: _dnsAccountId,
+              options: widget.dnsAccounts
+                  .map(
+                    (a) => AppPickerOption(
+                      value: a.id,
+                      label: a.name.isEmpty ? 'DNS #${a.id}' : a.name,
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => setState(() => _dnsAccountId = v),
             ),
-            const SizedBox(height: 12),
-            _buildTextField(
-              controller: _otherDomainsController,
-              label: context.l10n.websites_otherDomains,
-              placeholder: context.l10n.websites_otherDomainsPlaceholder,
-              icon: TablerIcons.world_latitude,
-              multiline: true,
-            ),
-            const SizedBox(height: 12),
-            _buildTextField(
-              controller: _descriptionController,
-              label: context.l10n.common_description,
-              placeholder: context.l10n.websites_optional,
-              icon: TablerIcons.notes,
-            ),
-            const SizedBox(height: 18),
-            AppSectionHeader(
-              title: context.l10n.websites_validationMethod,
-              icon: TablerIcons.shield_check,
-            ),
-            _buildPickerSection<String>(
-              icon: TablerIcons.shield_check,
-              label: context.l10n.websites_validationMethod,
-              value: _provider,
-              options: _providerOptions(context),
-              onChanged: (v) => setState(() => _provider = v),
-            ),
-            if (_provider == 'dnsAccount') ...[
-              const SizedBox(height: 12),
-              _buildPickerSection<int>(
-                icon: TablerIcons.user_circle,
-                label: context.l10n.websites_acmeAccount,
-                value: _acmeAccountId,
-                options: widget.acmeAccounts
-                    .map(
-                      (a) => AppPickerOption(value: a.id, label: a.displayName),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => _acmeAccountId = v),
-              ),
-              const SizedBox(height: 12),
-              _buildPickerSection<int>(
-                icon: TablerIcons.world,
-                label: context.l10n.websites_dnsAccount,
-                value: _dnsAccountId,
-                options: widget.dnsAccounts
-                    .map(
-                      (a) => AppPickerOption(
-                        value: a.id,
-                        label: a.name.isEmpty ? 'DNS #${a.id}' : a.name,
-                      ),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => _dnsAccountId = v),
-              ),
-            ],
-            if (_provider == 'dnsManual') ...[
-              const SizedBox(height: 12),
-              _buildPickerSection<int>(
-                icon: TablerIcons.user_circle,
-                label: context.l10n.websites_acmeAccount,
-                value: _acmeAccountId,
-                options: widget.acmeAccounts
-                    .map(
-                      (a) => AppPickerOption(value: a.id, label: a.displayName),
-                    )
-                    .toList(),
-                onChanged: (v) => setState(() => _acmeAccountId = v),
-              ),
-            ],
-            const SizedBox(height: 18),
-            AppSectionHeader(
-              title: context.l10n.websites_advancedOptions,
-              icon: TablerIcons.adjustments,
-            ),
-            _buildPickerSection<String>(
-              icon: TablerIcons.key,
-              label: context.l10n.websites_keyAlgorithm,
-              value: _keyType,
-              options: _keyTypeOptions,
-              onChanged: (v) => setState(() => _keyType = v),
-            ),
-            const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 18),
+          AppSectionHeader(
+            title: context.l10n.websites_advancedOptions,
+            icon: TablerIcons.adjustments,
+          ),
+          _buildPickerSection<String>(
+            icon: TablerIcons.key,
+            label: context.l10n.websites_keyAlgorithm,
+            value: _keyType,
+            options: _keyTypeOptions,
+            onChanged: (v) => setState(() => _keyType = v),
+          ),
+          const SizedBox(height: 12),
+          if (_provider != 'dnsManual' && _provider != 'selfSigned')
             _buildSwitchRow(
               icon: TablerIcons.refresh,
               label: context.l10n.websites_autoRenew,
               value: _autoRenew,
               onChanged: (v) => setState(() => _autoRenew = v),
             ),
+          if (_provider != 'selfSigned') ...[
             _buildSwitchRow(
               icon: TablerIcons.router,
               label: context.l10n.websites_skipDnsValidation,
@@ -377,7 +366,7 @@ class _SslCreateSheetState extends State<_SslCreateSheet> {
               icon: TablerIcons.server_2,
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -599,7 +588,7 @@ class _SslCreateSheetState extends State<_SslCreateSheet> {
               ),
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

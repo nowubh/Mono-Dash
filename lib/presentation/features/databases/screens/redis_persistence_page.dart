@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -473,11 +474,7 @@ class _SwitchRow extends StatelessWidget {
               ),
             ),
           ),
-          CupertinoSwitch(
-            value: value,
-            activeTrackColor: CupertinoColors.activeGreen,
-            onChanged: onChanged,
-          ),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

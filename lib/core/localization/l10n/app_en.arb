@@ -919,6 +919,14 @@
   "@files_actionRemoveFavorite": {
     "description": "Files context menu action to remove an item from favorites."
   },
+  "files_favoritesTitle": "Favorites",
+  "@files_favoritesTitle": {
+    "description": "Title for the file favorites sheet and menu item."
+  },
+  "files_favoritesEmpty": "No favorites yet",
+  "@files_favoritesEmpty": {
+    "description": "Empty state for the file favorites sheet."
+  },
   "files_actionManageShare": "Manage Share",
   "@files_actionManageShare": {
     "description": "Files context menu action to manage an existing share."
@@ -2871,6 +2879,18 @@
   "premium_moreFeaturesDescription": ", multi-device sync, and more advanced features are in development.",
   "@premium_moreFeaturesDescription": {
     "description": "Premium benefit description suffix for future features."
+  },
+  "premium_testflightTitle": "TestFlight Beta",
+  "@premium_testflightTitle": {
+    "description": "Premium benefit title for TestFlight early access."
+  },
+  "premium_testflightDescription": "Try new features early. You can also leave your contact via in-app feedback — we'll send a TestFlight invite.",
+  "@premium_testflightDescription": {
+    "description": "Premium benefit description for TestFlight early access, including the feedback path."
+  },
+  "premium_testflightApplyHint": " Apply",
+  "@premium_testflightApplyHint": {
+    "description": "Hint shown on the TestFlight benefit when the user can open the application sheet."
   },
   "premium_supportTitle": "Support Open Source",
   "@premium_supportTitle": {
@@ -16061,5 +16081,31 @@
   "supervisor_restart": "Restart",
   "@supervisor_restart": {
     "description": "Supervisor restart operation label."
-  }
+  },
+  "testflight_title": "Apply for TestFlight",
+  "@testflight_title": {"description": "TestFlight application sheet title."},
+  "testflight_description": "Enter the email for your invitation. It can't be changed later.",
+  "@testflight_description": {"description": "TestFlight application policy explanation."},
+  "testflight_emailLabel": "TestFlight email",
+  "@testflight_emailLabel": {"description": "TestFlight invitation email field label."},
+  "testflight_submit": "Submit",
+  "@testflight_submit": {"description": "TestFlight application submit button."},
+  "testflight_openApplication": "Apply for TestFlight access",
+  "@testflight_openApplication": {"description": "Legacy label for opening the TestFlight application sheet."},
+  "testflight_invalidEmail": "Enter a valid email address",
+  "@testflight_invalidEmail": {"description": "Invalid TestFlight email validation message."},
+  "testflight_resultTitle": "Application result",
+  "@testflight_resultTitle": {"description": "TestFlight application result dialog title."},
+  "testflight_invited": "Invitation sent. Check your inbox and spam folder.",
+  "@testflight_invited": {"description": "Successful TestFlight invitation message."},
+  "testflight_pending": "Application submitted. Check your email shortly.",
+  "@testflight_pending": {"description": "Pending TestFlight application message."},
+  "testflight_notEligible": "Can't apply right now. Try again later, or leave your contact via feedback.",
+  "@testflight_notEligible": {"description": "TestFlight eligibility failure message."},
+  "testflight_alreadyApplied": "This email has already been used.",
+  "@testflight_alreadyApplied": {"description": "Duplicate TestFlight application message."},
+  "testflight_notConfigured": "This build does not configure the TestFlight application service.",
+  "@testflight_notConfigured": {"description": "Missing TestFlight service build configuration message."},
+  "testflight_serviceUnavailable": "The application service is temporarily unavailable. Try again later.",
+  "@testflight_serviceUnavailable": {"description": "Temporary TestFlight service error message."}
 }

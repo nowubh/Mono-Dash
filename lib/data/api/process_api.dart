@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:crypto/crypto.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../core/network/api_response_parser.dart';
-import '../../core/network/app_user_agent.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/network/one_panel_auth.dart';
 import '../../core/network/web_socket_connector.dart';
 
 /// 进程管理 API（对应 1Panel `/process` 相关接口）。
@@ -49,11 +45,6 @@ class ProcessApi {
     String? operateNode = 'local',
   }) async {
     final uri = Uri.parse(baseUrl);
-    final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000)
-        .toString();
-    final token = md5
-        .convert(utf8.encode('1panel$apiKey$timestamp'))
-        .toString();
     final wsUrl = Uri(
       scheme: uri.scheme == 'https' ? 'wss' : 'ws',
       host: uri.host,
@@ -63,15 +54,17 @@ class ProcessApi {
           ? null
           : {'operateNode': operateNode},
     );
-    final userAgent = await AppUserAgent.value;
+    final headers = await OnePanelAuth.signedHeaders(apiKey);
 
+    await checkAppWebSocketAuth(
+      wsUrl,
+      headers: headers,
+      allowInsecureConnections: allowInsecureConnections,
+      currentNode: operateNode,
+    );
     return connectAppWebSocket(
       wsUrl,
-      headers: {
-        '1Panel-Token': token,
-        '1Panel-Timestamp': timestamp,
-        HttpHeaders.userAgentHeader: userAgent,
-      },
+      headers: headers,
       allowInsecureConnections: allowInsecureConnections,
     );
   }

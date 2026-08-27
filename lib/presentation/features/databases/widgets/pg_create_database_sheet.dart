@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -378,7 +379,7 @@ class _PgCreateDatabaseSheetState
                 child: Container(
                   height: 44,
                   alignment: Alignment.centerRight,
-                  child: CupertinoSwitch(
+                  child: AppToggleSwitch(
                     value: _superUser,
                     onChanged: (v) => setState(() => _superUser = v),
                   ),

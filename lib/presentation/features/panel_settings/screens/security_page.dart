@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -272,7 +273,7 @@ class _SecurityContentState extends ConsumerState<_SecurityContent> {
                                   ? l10n.panelSettings_enabled
                                   : l10n.panelSettings_disabled,
                             ),
-                            trailing: CupertinoSwitch(
+                            trailing: AppToggleSwitch(
                               value: _get('ssl') == 'Enable',
                               onChanged: (v) async {
                                 if (!v) {
@@ -364,7 +365,7 @@ class _SecurityContentState extends ConsumerState<_SecurityContent> {
                             subtitle: Text(
                               l10n.panelSettings_passwordComplexitySubtitle,
                             ),
-                            trailing: CupertinoSwitch(
+                            trailing: AppToggleSwitch(
                               value: _getBool('complexityVerification'),
                               onChanged: (v) => _update(
                                 'ComplexityVerification',
@@ -393,7 +394,7 @@ class _SecurityContentState extends ConsumerState<_SecurityContent> {
                                   ? l10n.panelSettings_enabled
                                   : l10n.panelSettings_disabled,
                             ),
-                            trailing: CupertinoSwitch(
+                            trailing: AppToggleSwitch(
                               value: _get('mfaStatus') == 'Enable',
                               onChanged: (v) async {
                                 if (!v) {

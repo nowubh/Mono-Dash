@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
-import 'package:crypto/crypto.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Tooltip;
@@ -13,7 +11,8 @@ import 'package:xterm/xterm.dart';
 
 import '../../../../core/localization/l10n_x.dart';
 import '../../../../core/localization/locale_controller.dart';
-import '../../../../core/network/app_user_agent.dart';
+import '../../../../core/network/api_compatibility.dart';
+import '../../../../core/network/one_panel_auth.dart';
 import '../../../../core/network/web_socket_connector.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/storage/storage_service.dart';
@@ -157,51 +156,62 @@ class _AppTerminalScreenState extends ConsumerState<_AppTerminalScreen> {
       final uri = Uri.parse(baseUrl);
       final wsScheme = uri.scheme == 'https' ? 'wss' : 'ws';
 
-      final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000)
-          .toString();
-      final tokenRaw = '1panel$apiKey$timestamp';
-      final token = md5.convert(utf8.encode(tokenRaw)).toString();
-      final userAgent = await AppUserAgent.value;
-
       final isDatabase = widget.source == 'database';
       final isRedis =
           isDatabase && (widget.databaseType?.contains('redis') ?? false);
-      final wsUrl = Uri(
-        scheme: wsScheme,
-        host: uri.host,
-        port: uri.port,
-        path: widget.source == 'host'
-            ? '${uri.path}/api/v2/hosts/terminal'.replaceAll('//', '/')
-            : '${uri.path}/api/v2/containers/exec'.replaceAll('//', '/'),
-        queryParameters: {
-          'cols': _terminal.viewWidth.toString(),
-          'rows': _terminal.viewHeight.toString(),
-          if (isRedis) ...{
-            'source': 'redis',
-            'name': widget.databaseName ?? '',
-            'from': 'local',
-          } else if (isDatabase) ...{
-            'source': 'database',
-            'databaseType': widget.databaseType ?? '',
-            'database': widget.databaseName ?? '',
-          } else ...{
-            'source': widget.source,
-            'containerid': widget.containerId,
-            'user': widget.user,
-            'command': widget.command,
-          },
-          'operateNode': 'local',
+      final headers = await OnePanelAuth.signedHeaders(apiKey);
+      final queryParameters = {
+        'cols': _terminal.viewWidth.toString(),
+        'rows': _terminal.viewHeight.toString(),
+        if (isRedis) ...{
+          'source': widget.databaseType ?? 'redis',
+          'name': widget.databaseName ?? '',
+          'from': 'local',
+        } else if (isDatabase) ...{
+          'source': 'database',
+          'databaseType': widget.databaseType ?? '',
+          'database': widget.databaseName ?? '',
+        } else ...{
+          'source': widget.source,
+          'containerid': widget.containerId,
+          'user': widget.user,
+          'command': widget.command,
         },
-      );
+        'operateNode': 'local',
+      };
 
-      _channel = connectAppWebSocket(
-        wsUrl,
-        headers: {
-          '1Panel-Token': token,
-          '1Panel-Timestamp': timestamp,
-          HttpHeaders.userAgentHeader: userAgent,
-        },
-        allowInsecureConnections: server.allowInsecureConnections,
+      _channel = await ApiCompatibility.tryVariants<WebSocketChannel>(
+        _terminalPaths(widget.source)
+            .map((path) {
+              final wsUrl = Uri(
+                scheme: wsScheme,
+                host: uri.host,
+                port: uri.port,
+                path: '${uri.path}$path'.replaceAll('//', '/'),
+                queryParameters: queryParameters,
+              );
+              return ApiEndpointVariant<WebSocketChannel>(
+                name: path,
+                call: () async {
+                  await checkAppWebSocketAuth(
+                    wsUrl,
+                    headers: headers,
+                    allowInsecureConnections: server.allowInsecureConnections,
+                    currentNode: 'local',
+                  );
+                  return connectAppWebSocket(
+                    wsUrl,
+                    headers: headers,
+                    allowInsecureConnections: server.allowInsecureConnections,
+                  );
+                },
+              );
+            })
+            .toList(growable: false),
+        cacheScope: serverId,
+        cacheKey: widget.source == 'host'
+            ? 'terminal.host'
+            : 'terminal.container',
       );
 
       _subscription = _channel!.stream.listen(
@@ -275,6 +285,16 @@ class _AppTerminalScreenState extends ConsumerState<_AppTerminalScreen> {
         _statusMessage = l10n.terminal_initializationFailed('$e');
       });
     }
+  }
+
+  List<String> _terminalPaths(String source) {
+    if (source == 'host') {
+      return const ['/api/v2/hosts/terminal/local', '/api/v2/hosts/terminal'];
+    }
+    return const [
+      '/api/v2/hosts/terminal/container',
+      '/api/v2/containers/exec',
+    ];
   }
 
   @override
@@ -446,12 +466,11 @@ class _AppTerminalScreenState extends ConsumerState<_AppTerminalScreen> {
                     )
                   : context.l10n.terminal_containerTitle(widget.containerId),
               onBack: () => Navigator.of(context).maybePop(),
-              trailingBuilder: (isDark, isOverlapping) =>
-                  _FrostedFloatButton(
-                    onTap: _floatTerminal,
-                    isDark: isDark,
-                    isOverlapping: isOverlapping,
-                  ),
+              trailingBuilder: (isDark, isOverlapping) => _FrostedFloatButton(
+                onTap: _floatTerminal,
+                isDark: isDark,
+                isOverlapping: isOverlapping,
+              ),
             ),
           ),
         ],
@@ -506,6 +525,11 @@ class _TerminalShortcutToolbar extends StatelessWidget {
               tooltip: context.l10n.terminal_pasteToTerminal,
               enabled: enabled,
               onPressed: onPaste,
+            ),
+            _TerminalShortcutButton.text(
+              label: 'Enter',
+              enabled: enabled,
+              onPressed: () => onKey(TerminalKey.enter),
             ),
             _TerminalShortcutButton.text(
               label: 'Esc',

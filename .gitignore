@@ -74,3 +74,4 @@
 # Environment files
 .env*
 !.env.example
+docs/

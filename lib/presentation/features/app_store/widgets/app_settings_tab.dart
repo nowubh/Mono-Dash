@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/l10n_x.dart';
@@ -221,11 +222,7 @@ class _AppSettingsTabState extends ConsumerState<AppSettingsTab> {
             ),
           ),
           const SizedBox(width: 16),
-          CupertinoSwitch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: CupertinoColors.activeBlue.resolveFrom(context),
-          ),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

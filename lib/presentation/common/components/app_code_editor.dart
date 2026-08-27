@@ -72,6 +72,12 @@ final SelectionToolbarController _kEditableCodeSelectionToolbarController =
 final SelectionToolbarController _kReadOnlyCodeSelectionToolbarController =
     _CodeSelectionToolbarController(readOnly: true);
 
+SelectionToolbarController appCodeSelectionToolbarController({
+  required bool readOnly,
+}) => readOnly
+    ? _kReadOnlyCodeSelectionToolbarController
+    : _kEditableCodeSelectionToolbarController;
+
 /// 代码编辑器小部件，仅负责编辑视图本身，不关心外壳/导航/保存。
 ///
 /// 典型用法是与 [showAppCodeEditorSheet] 组合；若有定制需求也可单独嵌入页面。
@@ -103,9 +109,7 @@ class AppCodeEditor extends StatelessWidget {
     final bgColor = AppColors.background(context);
     return CodeEditor(
       controller: controller,
-      toolbarController: readOnly
-          ? _kReadOnlyCodeSelectionToolbarController
-          : _kEditableCodeSelectionToolbarController,
+      toolbarController: appCodeSelectionToolbarController(readOnly: readOnly),
       readOnly: readOnly,
       wordWrap: false,
       hint: hint,

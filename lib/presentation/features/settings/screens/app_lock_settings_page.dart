@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -94,7 +95,7 @@ class _AppLockSettingsPageState extends ConsumerState<AppLockSettingsPage> {
           iconColor: CupertinoColors.systemGreen,
           title: l10n.settings_appLock_misleadingPinFeedbackTitle,
           subtitle: l10n.settings_appLock_misleadingPinFeedbackSubtitle,
-          trailing: CupertinoSwitch(
+          trailing: AppToggleSwitch(
             value: settings.misleadingPinFeedbackEnabled,
             onChanged: (value) => ref
                 .read(appLockControllerProvider.notifier)
@@ -121,7 +122,7 @@ class _AppLockSettingsPageState extends ConsumerState<AppLockSettingsPage> {
               subtitle: settings.enabled
                   ? l10n.settings_appLock_subtitleOn
                   : l10n.settings_appLock_subtitleOff,
-              trailing: CupertinoSwitch(
+              trailing: AppToggleSwitch(
                 value: settings.enabled,
                 onChanged: (value) =>
                     value ? _showSetPinSheet(settings) : _disableAppLock(),
@@ -149,7 +150,7 @@ class _AppLockSettingsPageState extends ConsumerState<AppLockSettingsPage> {
               title: biometric.title,
               subtitle: biometric.subtitle,
               isEnabled: settings.enabled && settings.biometricAvailable,
-              trailing: CupertinoSwitch(
+              trailing: AppToggleSwitch(
                 value: settings.enabled && settings.biometricEnabled,
                 onChanged: settings.enabled && settings.biometricAvailable
                     ? (value) => ref
@@ -819,7 +820,7 @@ class _InlineSwitch extends StatelessWidget {
               ],
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:re_editor/re_editor.dart';
@@ -214,27 +215,31 @@ class _AppInstallSheetState extends ConsumerState<_AppInstallSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      bottom: false,
-      child: Container(
-        height: MediaQuery.sizeOf(context).height * 0.9,
-        decoration: BoxDecoration(
-          color: AppColors.background(context),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          children: [
-            _buildHandle(),
-            _buildHeader(),
-            Expanded(
-              child: _loading
-                  ? const Center(child: CupertinoActivityIndicator())
-                  : _error != null
-                  ? _buildError()
-                  : _buildForm(),
-            ),
-          ],
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 200),
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: Container(
+          height: MediaQuery.sizeOf(context).height * 0.9,
+          decoration: BoxDecoration(
+            color: AppColors.background(context),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              _buildHandle(),
+              _buildHeader(),
+              Expanded(
+                child: _loading
+                    ? const Center(child: CupertinoActivityIndicator())
+                    : _error != null
+                    ? _buildError()
+                    : _buildForm(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -597,7 +602,7 @@ class _OptionItem extends StatelessWidget {
                   ),
                 ),
               ),
-              CupertinoSwitch(value: value, onChanged: onChanged),
+              AppToggleSwitch(value: value, onChanged: onChanged),
             ],
           ),
           if (subtitle != null) ...[

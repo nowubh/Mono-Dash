@@ -11,6 +11,7 @@ import '../../core/utils/file_icon_path_cache.dart';
 import '../../domain/repositories/file_repository.dart';
 import '../../presentation/features/server_detail/providers/active_server_provider.dart';
 import '../api/file_api.dart';
+import '../dto/file/file_favorite_dto.dart';
 import '../dto/file/file_item_dto.dart';
 import '../dto/file/user_group_dto.dart';
 import '../dto/file/file_share_dto.dart';
@@ -91,7 +92,14 @@ class FileRepositoryImpl implements FileRepository {
   Future<int> favoriteFile(String path) => _fileApi.favoriteFile(path);
 
   @override
-  Future<void> deleteFavorite(int favoriteID) => _fileApi.deleteFavorite(favoriteID);
+  Future<void> deleteFavorite(int favoriteID) =>
+      _fileApi.deleteFavorite(favoriteID);
+
+  @override
+  Future<List<FileFavoriteDto>> searchFavorites() async {
+    final result = await _fileApi.searchFavorites();
+    return result.items;
+  }
 
   @override
   Future<UserGroupDto> getUserGroups() => _fileApi.getUserGroups();

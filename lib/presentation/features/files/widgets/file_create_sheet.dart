@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
@@ -244,10 +245,9 @@ class _FileCreateSheetState extends ConsumerState<FileCreateSheet> {
                 child: Transform.scale(
                   scale: 0.75,
                   alignment: Alignment.centerRight,
-                  child: CupertinoSwitch(
+                  child: AppToggleSwitch(
                     value: _isLink,
                     onChanged: (val) => setState(() => _isLink = val),
-                    activeTrackColor: CupertinoColors.activeBlue,
                   ),
                 ),
               ),

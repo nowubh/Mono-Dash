@@ -644,6 +644,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get files_actionRemoveFavorite => '移除收藏';
 
   @override
+  String get files_favoritesTitle => '收藏夹';
+
+  @override
+  String get files_favoritesEmpty => '暂无收藏项目';
+
+  @override
   String get files_actionManageShare => '管理分享';
 
   @override
@@ -2031,6 +2037,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get premium_moreFeaturesDescription => '、多端同步等更多高级功能正在开发中，敬请期待。';
+
+  @override
+  String get premium_testflightTitle => 'TestFlight 内测';
+
+  @override
+  String get premium_testflightDescription =>
+      '提前体验新功能。有 bug 或建议时，也可通过反馈留下联系方式，我们会发送 TestFlight 邀请。';
+
+  @override
+  String get premium_testflightApplyHint => ' 去申请';
 
   @override
   String get premium_supportTitle => '支持开源项目';
@@ -11547,4 +11563,43 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get supervisor_restart => '重启';
+
+  @override
+  String get testflight_title => '申请 TestFlight';
+
+  @override
+  String get testflight_description => '填写接收邀请的邮箱，提交后不可修改。';
+
+  @override
+  String get testflight_emailLabel => 'TestFlight 邮箱';
+
+  @override
+  String get testflight_submit => '提交申请';
+
+  @override
+  String get testflight_openApplication => '申请 TestFlight 测试资格';
+
+  @override
+  String get testflight_invalidEmail => '请输入有效的邮箱地址';
+
+  @override
+  String get testflight_resultTitle => '申请结果';
+
+  @override
+  String get testflight_invited => '邀请已发送，请检查邮箱（含垃圾邮件）。';
+
+  @override
+  String get testflight_pending => '申请已提交，请稍后查收邮件。';
+
+  @override
+  String get testflight_notEligible => '暂时无法申请，请稍后重试，或通过反馈留下联系方式。';
+
+  @override
+  String get testflight_alreadyApplied => '该邮箱已经申请过。';
+
+  @override
+  String get testflight_notConfigured => '当前构建未配置 TestFlight 申请服务。';
+
+  @override
+  String get testflight_serviceUnavailable => '申请服务暂时不可用，请稍后重试。';
 }

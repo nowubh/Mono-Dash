@@ -1262,6 +1262,18 @@ abstract class AppLocalizations {
   /// **'Remove Favorite'**
   String get files_actionRemoveFavorite;
 
+  /// Title for the file favorites sheet and menu item.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get files_favoritesTitle;
+
+  /// Empty state for the file favorites sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get files_favoritesEmpty;
+
   /// Files context menu action to manage an existing share.
   ///
   /// In en, this message translates to:
@@ -3871,6 +3883,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **', multi-device sync, and more advanced features are in development.'**
   String get premium_moreFeaturesDescription;
+
+  /// Premium benefit title for TestFlight early access.
+  ///
+  /// In en, this message translates to:
+  /// **'TestFlight Beta'**
+  String get premium_testflightTitle;
+
+  /// Premium benefit description for TestFlight early access, including the feedback path.
+  ///
+  /// In en, this message translates to:
+  /// **'Try new features early. You can also leave your contact via in-app feedback — we\'ll send a TestFlight invite.'**
+  String get premium_testflightDescription;
+
+  /// Hint shown on the TestFlight benefit when the user can open the application sheet.
+  ///
+  /// In en, this message translates to:
+  /// **' Apply'**
+  String get premium_testflightApplyHint;
 
   /// Premium benefit title for supporting the open source project.
   ///
@@ -21900,6 +21930,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restart'**
   String get supervisor_restart;
+
+  /// TestFlight application sheet title.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply for TestFlight'**
+  String get testflight_title;
+
+  /// TestFlight application policy explanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email for your invitation. It can\'t be changed later.'**
+  String get testflight_description;
+
+  /// TestFlight invitation email field label.
+  ///
+  /// In en, this message translates to:
+  /// **'TestFlight email'**
+  String get testflight_emailLabel;
+
+  /// TestFlight application submit button.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get testflight_submit;
+
+  /// Legacy label for opening the TestFlight application sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply for TestFlight access'**
+  String get testflight_openApplication;
+
+  /// Invalid TestFlight email validation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get testflight_invalidEmail;
+
+  /// TestFlight application result dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Application result'**
+  String get testflight_resultTitle;
+
+  /// Successful TestFlight invitation message.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent. Check your inbox and spam folder.'**
+  String get testflight_invited;
+
+  /// Pending TestFlight application message.
+  ///
+  /// In en, this message translates to:
+  /// **'Application submitted. Check your email shortly.'**
+  String get testflight_pending;
+
+  /// TestFlight eligibility failure message.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t apply right now. Try again later, or leave your contact via feedback.'**
+  String get testflight_notEligible;
+
+  /// Duplicate TestFlight application message.
+  ///
+  /// In en, this message translates to:
+  /// **'This email has already been used.'**
+  String get testflight_alreadyApplied;
+
+  /// Missing TestFlight service build configuration message.
+  ///
+  /// In en, this message translates to:
+  /// **'This build does not configure the TestFlight application service.'**
+  String get testflight_notConfigured;
+
+  /// Temporary TestFlight service error message.
+  ///
+  /// In en, this message translates to:
+  /// **'The application service is temporarily unavailable. Try again later.'**
+  String get testflight_serviceUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/localization/l10n_x.dart';
@@ -299,7 +300,7 @@ class _LimitBodyState extends ConsumerState<_LimitBody> {
                   ),
                 ),
               ),
-              CupertinoSwitch(
+              AppToggleSwitch(
                 value: _enabled,
                 onChanged: (value) => setState(() => _enabled = value),
               ),

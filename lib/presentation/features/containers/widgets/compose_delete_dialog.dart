@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import '../../../../core/localization/l10n_x.dart';
 import '../../../common/components/frosted_dialog.dart';
@@ -84,11 +85,7 @@ class _OptionRow extends StatelessWidget {
                 ),
               ),
             ),
-            CupertinoSwitch(
-              value: value,
-              onChanged: onChanged,
-              activeTrackColor: CupertinoColors.systemRed,
-            ),
+            AppToggleSwitch(value: value, onChanged: onChanged),
           ],
         ),
         const SizedBox(height: 4),

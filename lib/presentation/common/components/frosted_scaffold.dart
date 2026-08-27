@@ -16,6 +16,7 @@ class FrostedScaffold extends StatefulWidget {
   final Color? titleColor;
   final bool useMiddleTruncate;
   final Widget? titleWidget;
+  final bool largeTitle;
 
   const FrostedScaffold({
     super.key,
@@ -28,6 +29,7 @@ class FrostedScaffold extends StatefulWidget {
     this.titleColor,
     this.useMiddleTruncate = false,
     this.titleWidget,
+    this.largeTitle = false,
   });
 
   /// 内容顶部 padding（状态栏 + 导航栏高度，不含渐变）
@@ -36,8 +38,13 @@ class FrostedScaffold extends StatefulWidget {
   }
 
   /// 内容顶部 padding（含渐变区域，用于 WebView 等非滚动内容，确保完全不被遮挡）
-  static double contentTopPaddingFull(BuildContext context, {double fadeOutDistance = 12.0}) {
-    return MediaQuery.paddingOf(context).top + FrostedHeader.headerHeight + fadeOutDistance;
+  static double contentTopPaddingFull(
+    BuildContext context, {
+    double fadeOutDistance = 12.0,
+  }) {
+    return MediaQuery.paddingOf(context).top +
+        FrostedHeader.headerHeight +
+        fadeOutDistance;
   }
 
   @override
@@ -46,12 +53,20 @@ class FrostedScaffold extends StatefulWidget {
 
 class _FrostedScaffoldState extends State<FrostedScaffold> {
   bool _isOverlapping = false;
+  double _scrollOffset = 0;
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification) {
       final overlapping = notification.metrics.pixels > 0;
-      if (overlapping != _isOverlapping) {
-        setState(() => _isOverlapping = overlapping);
+      final offset = notification.metrics.pixels
+          .clamp(0, double.infinity)
+          .toDouble();
+      if (overlapping != _isOverlapping ||
+          (widget.largeTitle && (offset - _scrollOffset).abs() > 0.5)) {
+        setState(() {
+          _isOverlapping = overlapping;
+          _scrollOffset = offset;
+        });
       }
     }
     return false;
@@ -59,6 +74,17 @@ class _FrostedScaffoldState extends State<FrostedScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final collapseProgress = widget.largeTitle
+        ? (_scrollOffset / 52).clamp(0.0, 1.0)
+        : 1.0;
+    final largeTitleTop = FrostedScaffold.contentTopPadding(context) + 8;
+    final largeTitleOpacity = Curves.easeIn.transform(
+      (1 - collapseProgress).clamp(0.0, 1.0),
+    );
+    final compactTitleOpacity = Curves.easeOut.transform(
+      ((collapseProgress - 0.5) / 0.5).clamp(0.0, 1.0),
+    );
+
     return CupertinoPageScaffold(
       backgroundColor: AppColors.background(context),
       child: Stack(
@@ -83,8 +109,29 @@ class _FrostedScaffoldState extends State<FrostedScaffold> {
               titleColor: widget.titleColor,
               useMiddleTruncate: widget.useMiddleTruncate,
               titleWidget: widget.titleWidget,
+              titleOpacity: widget.largeTitle ? compactTitleOpacity : 1,
             ),
           ),
+          if (widget.largeTitle)
+            Positioned(
+              top: largeTitleTop - _scrollOffset,
+              left: 16,
+              right: 16,
+              child: IgnorePointer(
+                child: Opacity(
+                  key: const ValueKey('frosted-large-title'),
+                  opacity: largeTitleOpacity,
+                  child: Text(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CupertinoTheme.of(
+                      context,
+                    ).textTheme.navLargeTitleTextStyle,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

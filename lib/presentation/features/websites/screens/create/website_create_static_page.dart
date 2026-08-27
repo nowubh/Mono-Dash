@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:mono_dash/core/widgets/app_toggle_switch.dart';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -569,7 +570,7 @@ class _WebsiteCreateStaticPageState
               ),
             ),
           ),
-          CupertinoSwitch(value: value, onChanged: onChanged),
+          AppToggleSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

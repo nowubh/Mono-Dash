@@ -11,6 +11,7 @@ import '../../../files/providers/files_provider.dart';
 import '../../../files/screens/download_manager_page.dart';
 import '../../../files/widgets/file_create_sheet.dart';
 import '../../../files/widgets/file_display_options_sheet.dart';
+import '../../../files/widgets/file_favorites_sheet.dart';
 import '../../../files/widgets/file_upload_sheet.dart';
 import '../../../files/widgets/remote_download_sheet.dart';
 import '../../../files/widgets/file_share_list_sheet.dart';
@@ -108,6 +109,16 @@ class FilesOverlayMenu extends ConsumerWidget {
           text: l10n.common_search,
           icon: TablerIcons.search,
           action: onSearchModeEnter,
+        ),
+
+        // 5. 收藏夹
+        FrostedMenuItem(
+          text: l10n.files_favoritesTitle,
+          icon: TablerIcons.star,
+          action: () => FileFavoritesSheet.show(
+            context,
+            providerContainer: providerContainer,
+          ),
         ),
 
         // 5. 上传
